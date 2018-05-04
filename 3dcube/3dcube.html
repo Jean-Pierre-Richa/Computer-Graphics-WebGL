@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<button id = "ButtonX">Rotate X</button>
+<button id = "ButtonY">Rotate Y</button>
+<button id = "ButtonZ">Rotate Z</button>
+<button id = "ButtonT">Toggle Rotation</button>
+<!-- Problem 1 Implementing a button to change the current rotation direction -->
+<button id = "ButtonC">Change direction</button>
+
+<button id = "ButtonO">Orthographic/perspective</button>
+
+<!-- problem 7: button to switch between gouraud and phong shading -->
+<button id = "ButtonS">Phong/Gouraud</button>
+
+
+<!-- problem 3: translation and scaling sliders -->
+<div>Translate: X - <input id="tx" type="range" min="-1" max="1" step="0.01" value="0" /> + </div>
+<div>Translate: Y - <input id="ty" type="range" min="-1" max="1" step="0.01" value="0.6" /> + </div>
+<div>Translate: Z - <input id="tz" type="range" min="-1" max="1" step="0.01" value="0" /> + </div>
+<div>Scale: - <input id="s" type="range" min="0" max="1" step="0.01" value="0.5" /> + </div>
+
+<!-- problem 6: light position sliders -->
+<div>Light position: X - <input id="lx" type="range" min="-10" max="10" step="0.01" value="0" /> + </div>
+<div>Light position: Y - <input id="ly" type="range" min="-10" max="10" step="0.01" value="-2" /> + </div>
+<div>Light position: Z - <input id="lz" type="range" min="-10" max="10" step="0.01" value="10" /> + </div>
+
+<!-- problem 4 & 5: near, far, fov and aspect sliders -->
+<div>depth: near: - <input id="depthSlider" type="range" min="0.3" max="4.1" step="0.003" value="0.3" /> + </div>
+<div>depth: far: - <input id="depthSlider2" type="range" min="0.2" max="4" step="0.002" value="4" /> + </div>
+<div>Fov: - <input id="fov" type="range" min="1" max="100" step="0.00001" value="100" /> + </div>
+<div>Aspect: - <input id="aspect" type="range" min="0.5" max="3" step="0.00001" value="1" /> + </div>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+
+
+attribute  vec3 vNormal;
+attribute  vec4 vPosition;
+attribute  vec4 vColor;
+
+varying vec4 fColor;
+varying vec3 fNormal;
+uniform vec3 theta;
+
+// problem 2
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+// problem 6
+uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+uniform vec4 lightPosition;
+uniform float shininess;
+varying vec3 N, L, E;
+//problem 7: shading button flag
+uniform bool shadingBool;
+
+// problem 7: calculating gouraud shading in the vertex shader
+void main()
+{
+	fNormal = mat3(modelViewMatrix) * vNormal;
+    vec3 pos = -(modelViewMatrix * vPosition).xyz;
+
+    //fixed light postion
+    vec3 light = lightPosition.xyz;
+    L = normalize( light - pos );
+    E = normalize( -pos );
+    vec3 H = normalize( L + E );
+    vec4 NN = vec4(vNormal,0);
+    // Transform vertex normal into eye coordinates
+    N = normalize( (modelViewMatrix*NN).xyz);
+  if(shadingBool){
+		// Compute terms in the illumination equation
+		vec4 ambient = ambientProduct;
+		float Kd = max( dot(L, N), 0.0 );
+		vec4  diffuse = Kd*diffuseProduct;
+		float Ks = pow( max(dot(N, H), 0.0), shininess );
+		vec4  specular = Ks * specularProduct;
+		if( dot(L, N) < 0.0 ) {
+			specular = vec4(0.0, 0.0, 0.0, 1.0);
+		}
+		gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+		fColor = ambient + diffuse +specular;
+		fColor.a = 1.0;
+	} else {
+		gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+	}
+}
+</script>
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+varying vec4 fColor;
+
+uniform vec4 AmbientProduct;
+uniform vec4 DiffuseProduct;
+uniform vec4 SpecularProduct;
+uniform float Shininess;
+varying vec3 E, L, N;
+
+// problem 7: shading flag
+uniform bool Shadingbool;
+uniform bool shadingBool;
+
+// problem 7: calculating phong shading in the vertex shader
+void main()
+{
+
+  if (shadingBool){
+		gl_FragColor = fColor;
+	}
+	if (Shadingbool){
+	vec4 fColor2;
+	vec3 H = normalize( L + E );
+	vec4 Ambient = AmbientProduct;
+	float kd = max( dot(L, N), 0.0 );
+	vec4 Diffuse = kd*DiffuseProduct;
+	float ks = pow( max(dot(N, H), 0.0), Shininess );
+	vec4 Specular = ks * SpecularProduct;
+	if( dot(L, N) < 0.0 ) Specular = vec4(0.0, 0.0, 0.0, 1.0);
+	fColor2 = Ambient + Diffuse + Specular;
+	fColor2.a = 1.0;
+	gl_FragColor = fColor2;
+	}
+
+}
+
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="3dcube.js"></script>
+
+<body>
+
+
+
+<canvas id="gl-canvas" width="1024" height="1024">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</body>
+</html>
