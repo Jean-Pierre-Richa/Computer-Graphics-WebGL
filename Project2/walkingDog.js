@@ -111,7 +111,7 @@ function initNodes(Id){
     switch(Id){
 
     case bodyId:
-    t = (translate(-7.0, 0.0, 0.0))
+    t = (translate(-10.0, 0.0, 0.0))
     t = mult(t, rotate(theta[bodyId], 0, 1, 0));
     figure[bodyId] = createNode(t, body, null, headId);
     break;
@@ -346,22 +346,22 @@ window.onload = function init() {
 
 function clear(){
     Sequence = 2;
+
 }
 
 function walk()
 {
-
     Sequence = 0;
 	theta[bodyId] = 0;
     initNodes(bodyId);
-
     setInterval(function(){ walkLoop(); }, speed);
-
+    var i = -10;
 function walkLoop()
 {
 
   if (theta[upperFLLId] > 160 && Sequence == 0)
   {
+      initNodes(bodyId)
       theta[upperFLLId] -= 1;
       initNodes(upperFLLId);
       theta[upperRLLId] -= 1;
@@ -372,10 +372,23 @@ function walkLoop()
       initNodes(upperRRLId);
       theta[tailId] -= 1;
       initNodes(tailId);
+      theta[bodyId] = 0;
+
+      if(theta[bodyId] == 0){
+        if(i <= 9.0){
+        i += 0.05;
+        initNodes(bodyId);
+        var t = mat4();
+        t = (translate(i, 0.0, 0.0));
+        t = mult(t, rotate(theta[bodyId], 0, 1, 0));
+        figure[bodyId] = createNode(t, body, null, headId);
+        // document.write("i=         " + i + "Walk");
+      }
+    }
       if(theta[upperFLLId] == 160){
         Sequence = 1;
       }
-    }
+     }
     if (theta[upperFLLId] <= 185 && Sequence == 1)
 	{
       theta[upperFLLId] += 1;
@@ -391,10 +404,15 @@ function walkLoop()
       if(theta[upperFLLId] == 185)
 	  {
         Sequence = 0;
-    }
+
+   }
   }
+ }
 }
-}
+
+
+
+
 var render = function() {
 
         gl.clear( gl.COLOR_BUFFER_BIT );
