@@ -71,7 +71,7 @@ var numNodes = 11;
 
 // Angles of the body parts
 // var theta = [0, 0, -80, -25, -80, -25, -80, -25, -80, -25, 180, 140];
-var theta = [0, 90, 185, -25, 185, -25, 185, -25, 185, -25, 45, 45];
+var theta = [null, 90, 185, -25, 185, -25, 185, -25, 185, -25, 45, 45];
 var numVertices = 24;
 // Stacking the modelViewMatrices
 var stack = [];
@@ -111,7 +111,7 @@ function initNodes(Id){
     switch(Id){
 
     case bodyId:
-    t = (translate(-10.0, 0.0, 0.0))
+    t = (translate(-10.0, 0.0, 0.0));
     t = mult(t, rotate(theta[bodyId], 0, 1, 0));
     figure[bodyId] = createNode(t, body, null, headId);
     break;
@@ -346,19 +346,20 @@ window.onload = function init() {
 
 function clear(){
     Sequence = 2;
-
+    // theta[bodyId] = 0;
 }
 
 function walk()
 {
     Sequence = 0;
-	theta[bodyId] = 0;
-    initNodes(bodyId);
+	// theta[bodyId];
+    // initNodes(bodyId);
     setInterval(function(){ walkLoop(); }, speed);
     var i = -10;
+
 function walkLoop()
 {
-
+  var t = mat4();
   if (theta[upperFLLId] > 160 && Sequence == 0)
   {
       initNodes(bodyId)
@@ -372,23 +373,35 @@ function walkLoop()
       initNodes(upperRRLId);
       theta[tailId] -= 1;
       initNodes(tailId);
-      theta[bodyId] = 0;
+      
 
       if(theta[bodyId] == 0){
-        if(i <= 9.0){
         i += 0.05;
         initNodes(bodyId);
-        var t = mat4();
         t = (translate(i, 0.0, 0.0));
         t = mult(t, rotate(theta[bodyId], 0, 1, 0));
         figure[bodyId] = createNode(t, body, null, headId);
-        // document.write("i=         " + i + "Walk");
       }
-    }
+        if (i>=9){
+           theta[bodyId] = 180;
+        }
+      if(theta[bodyId] == 180){
+        i -= 0.05;
+        initNodes(bodyId);
+        t = (translate(i, 0.0, 0.0));
+        t = mult(t, rotate(theta[bodyId], 0, 1, 0));
+        figure[bodyId] = createNode(t, body, null, headId);
+      }
+        if (i<=-9){
+           theta[bodyId] = 0;
+        }
+      // document.write("------first-------" + i + "-------" + theta[bodyId] + "-------");
+
       if(theta[upperFLLId] == 160){
         Sequence = 1;
       }
      }
+
     if (theta[upperFLLId] <= 185 && Sequence == 1)
 	{
       theta[upperFLLId] += 1;
@@ -404,14 +417,10 @@ function walkLoop()
       if(theta[upperFLLId] == 185)
 	  {
         Sequence = 0;
-
    }
   }
  }
 }
-
-
-
 
 var render = function() {
 
