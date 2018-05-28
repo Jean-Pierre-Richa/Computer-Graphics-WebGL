@@ -49,19 +49,19 @@ var tailId     = 11;
 // RLH = Rear Leg Height
 // RLW = Rear Leg Width
 
-var headH    = 1.5;
-var headW    = 1.0;
-var bodyH    = 5.0;
-var bodyW    = 1.0;
-var upperFLH = 2.5;
-var lowerFLH = 1.5;
-var upperFLW = 0.5;
-var lowerFLW = 0.5;
-var upperRLH = 2.5;
-var lowerRLH = 1.5;
-var upperRLW = 0.5;
-var lowerRLW = 0.5;
-var tailH    = 2.5;
+var headH    = 2.3;
+var headW    = 0.7;
+var bodyH    = 1.3;
+var bodyW    = 4.0;
+var upperFLH = 1.4;
+var lowerFLH = 1.1;
+var upperFLW = 0.3;
+var lowerFLW = 0.3;
+var upperRLH = 1.4;
+var lowerRLH = 1.1;
+var upperRLW = 0.3;
+var lowerRLW = 0.3;
+var tailH    = 1.5;
 var tailW    = 0.3;
 
 // The number of nodes to be created, 1 node for each object constituting
@@ -70,8 +70,8 @@ var numNodes = 11;
 
 
 // Angles of the body parts
-var theta = [240, 240, -80, -25, -80, -25, -80, -25, -80, -25, 180, 140];
-
+// var theta = [0, 0, -80, -25, -80, -25, -80, -25, -80, -25, 180, 140];
+var theta = [0, -50, 185, -20, 185, -20, 185, -20, 185, -20, 80, 40];
 var numVertices = 24;
 // Stacking the modelViewMatrices
 var stack = [];
@@ -82,6 +82,9 @@ for (var i = 0; i<=numNodes; i++) figure[i] = createNode(null, null, null, null)
 var vBuffer;
 var modelviewLoc;
 var pointsArray = [];
+
+var Sequence;
+var speed = 10;
 
 
 function scale4(a, b, c){
@@ -108,72 +111,73 @@ function initNodes(Id){
     switch(Id){
 
     case bodyId:
-    t = rotate(theta[bodyId], 1, 1, 1);
+    // t = (translate(-10.0, 0.0, 0.0));
+    t = mult(t, rotate(theta[bodyId], 0, 1, 0));
     figure[bodyId] = createNode(t, body, null, headId);
     break;
 
     case headId:
     case head1Id:
     case head2Id:
-    t = translate(0.0, bodyH + 0.5 * headH, 0.5);
-    t = mult(t, rotate(theta[head1Id], 1, 0, 0));
-    t = mult(t, rotate(theta[head2Id], 0, 1, 0));
+    t = translate(bodyW*0.55, 0.8*bodyH, 0.0);
+    t = mult(t, rotate(theta[head1Id], 0, 1, 0));
+    t = mult(t, rotate(theta[head2Id], 0, 0, 1));
     t = mult(t, translate(0.0, -0.5 * headH, 0.0));
     figure[headId] = createNode(t, head, upperFLLId, null);
     break;
 
     case upperFLLId:
-    t = translate(-(bodyW + upperFLW), 0.9 * bodyH, 0.0);
-    t = mult(t, rotate(theta[upperFLLId], 1, 0, 0));
+    t = translate(0.5 * bodyW -(upperFLW), 0.2, -(bodyW/2.0)+0.5*upperFLW);
+    t = mult(t, rotate(theta[upperFLLId], 0, 0, 1));
     figure[upperFLLId] = createNode(t, upperFLL, upperFRLId, lowerFLLId);
     break;
 
     case upperFRLId:
-    t = translate(bodyW + upperFLW, 0.9 * bodyH, 0.0);
-    t = mult(t, rotate(theta[upperFRLId], 1, 0, 0));
+    t = translate(0.5 * bodyW -(upperFLW), 0.2, (bodyW/2.0)-0.5*upperFLW);
+    t = mult(t, rotate(theta[upperFRLId], 0, 0, 1));
     figure[upperFRLId] = createNode(t, upperFRL, upperRLLId, lowerFRLId);
     break;
 
     case upperRLLId:
-    t = translate(-(bodyW + upperRLW), 0.1 * upperRLH, 0.0);
-    t = mult(t, rotate(theta[upperRLLId], 1, 0, 0));
+    t = translate(-(0.5 * bodyW) + upperRLW, 0.2, -(bodyW/2.0)+0.5*upperFLW);
+    t = mult(t, rotate(theta[upperRLLId], 0, 0, 1));
     figure[upperRLLId] = createNode(t, upperRLL, upperRRLId, lowerRLLId);
     break;
 
     case upperRRLId:
-    t = translate(bodyW + upperRLW, 0.1 * upperRLH, 0.0);
-    t = mult(t, rotate(theta[upperRRLId], 1, 0, 0));
+    t = translate(-(0.5 * bodyW) + upperRLW, 0.2, (bodyW/2.0)-0.5*upperFLW);
+    t = mult(t, rotate(theta[upperRRLId], 0, 0, 1));
     figure[upperRRLId] = createNode(t, upperRRL, tailId, lowerRRLId);
     break;
 
     case lowerFLLId:
 
-    t = translate(0.0, upperFLH, 0.0);
-    t = mult(t, rotate(theta[lowerFLLId], 1, 0, 0));
+    t = translate(0.0, upperFLH-0.1, 0.0);
+    t = mult(t, rotate(theta[lowerFLLId], 0, 0, 1));
     figure[lowerFLLId] = createNode(t, lowerFLL, null, null);
     break;
 
     case lowerFRLId:
-    t = translate(0.0, upperFLH, 0.0);
-    t = mult(t, rotate(theta[lowerFRLId], 1, 0, 0));
+    t = translate(0.0, upperFLH-0.1, 0.0);
+    t = mult(t, rotate(theta[lowerFRLId], 0, 0, 1));
     figure[lowerFRLId] = createNode(t, lowerFRL, null, null);
     break;
 
     case lowerRLLId:
-    t = translate(0.0, upperRLH, 0.0);
-    t = mult(t, rotate(theta[lowerRLLId], 1, 0, 0));
+    t = translate(0.0, upperRLH-0.1, 0.0);
+    t = mult(t, rotate(theta[lowerRLLId], 0, 0, 1));
     figure[lowerRLLId] = createNode(t, lowerRLL, null, null);
     break;
 
     case lowerRRLId:
-    t = translate(0.0, upperRLH, 0.0);
-    t = mult(t, rotate(theta[lowerRRLId], 1, 0, 0));
+    t = translate(0.0, upperRLH-0.1, 0.0);
+    t = mult(t, rotate(theta[lowerRRLId], 0, 0, 1));
     figure[lowerRRLId] = createNode(t, lowerRRL, null, null);
     break;
 
     case tailId:
-    t = translate(0.0, 0.0, 0.5);
-    t = mult(t, rotate(theta[tailId], 1, 0, 0));
+    t = translate(-(0.47 * bodyW), bodyH-0.1, 0.0);
+    t = mult(t, rotate(theta[tailId], 0, 0, 1));
     figure[tailId] = createNode(t, tail, null, null);
     break;
   }
@@ -287,7 +291,7 @@ function quad(a, b, c, d){
 
 function cube(){
   quad(1, 0, 3, 2);
-  quad(2, 3, 3, 6);
+  quad(2, 3, 7, 6);
   quad(3, 0, 4, 7);
   quad(6, 5, 1, 2);
   quad(4, 5, 6, 7);
@@ -325,10 +329,150 @@ window.onload = function init() {
     gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
+
+    document.getElementById("slider0").onchange = function(event) {
+      theta[bodyId ] = event.target.value;
+      initNodes(bodyId);
+  };
+
+    document.getElementById("walkButton").onclick = function(){
+      clear();
+      walk();
+      }
+
     for(i = 0; i<=numNodes; i++) initNodes(i);
     render();
 }
 
+function clear(){
+    Sequence = 2;
+    // theta[bodyId] = 0;
+}
+
+function walk()
+{
+    Sequence = 0;
+	// theta[bodyId];
+    // initNodes(bodyId);
+    setInterval(function(){ walkLoop(); }, speed);
+    var i = -10;
+
+function walkLoop()
+{
+  var t = mat4();
+  if (theta[upperFLLId] > 170 && Sequence == 0)
+  {
+      initNodes(bodyId)
+      theta[upperFLLId] -= 1;
+      initNodes(upperFLLId);
+      theta[upperRLLId] -= 1;
+      initNodes(upperRLLId);
+      theta[upperFRLId] += 1;
+      initNodes(upperFRLId);
+      theta[upperRRLId] += 1;
+      initNodes(upperRRLId);
+      theta[lowerFLLId] -= 1.3;
+      initNodes(lowerFLLId);
+      theta[lowerFRLId] += 1.3;
+      initNodes(lowerFRLId);
+      theta[lowerRLLId] -= 1.3;
+      initNodes(lowerRLLId);
+      theta[lowerRRLId] += 1.3;
+      initNodes(lowerRRLId);
+      theta[tailId] -= 2;
+      initNodes(tailId);
+
+
+
+      if(theta[bodyId] == 0){
+        i += 0.03;
+        theta[head1Id] -= 0.08;
+        theta[head2Id] += 0.03;
+
+      }
+        if (i>=9){
+           theta[bodyId] = 180;
+           theta[head1Id] = 50;
+           theta[head2Id] = 80;
+        }
+      if(theta[bodyId] == 180){
+        i -= 0.03;
+        theta[head1Id] += 0.08;
+        theta[head2Id] += 0.03;
+      }
+        if (i<=-9){
+           theta[bodyId] = 0;
+           theta[head1Id] = -50;
+           theta[head2Id] = 80;
+        }
+      initNodes(bodyId);
+      initNodes(headId);
+      t = (translate(i, 0.0, 0.0));
+      t = mult(t, rotate(theta[bodyId], 0, 1, 0));
+      figure[bodyId] = createNode(t, body, null, headId);
+      // document.write("------theta:-------" + theta[head2Id] + "----i:---" + i + "-------");
+
+      if(theta[upperFLLId] == 170){
+        Sequence = 1;
+      }
+     }
+
+    if (theta[upperFLLId] <= 205 && Sequence == 1)
+	{
+      theta[upperFLLId] += 1;
+      initNodes(upperFLLId);
+      theta[upperRLLId] += 1;
+      initNodes(upperRLLId);
+      theta[upperFRLId] -= 1;
+      initNodes(upperFRLId);
+      theta[upperRRLId] -= 1;
+      initNodes(upperRRLId);
+      theta[lowerFLLId] += 1.3;
+      initNodes(lowerFLLId);
+      theta[lowerFRLId] -= 1.3;
+      initNodes(lowerFRLId);
+      theta[lowerRLLId] += 1.3;
+      initNodes(lowerRLLId);
+      theta[lowerRRLId] -= 1.3;
+      initNodes(lowerRRLId);
+      theta[tailId] += 2;
+      initNodes(tailId);
+
+
+      if(theta[bodyId] == 0){
+        i += 0.03;
+        theta[head1Id] -= 0.08;
+        theta[head2Id] += 0.03;
+
+      }
+        if (i>=9){
+           theta[bodyId] = 180;
+           theta[head1Id] = 50;
+           theta[head2Id] = 80;
+        }
+      if(theta[bodyId] == 180){
+        i -= 0.03;
+        theta[head1Id] += 0.08;
+        theta[head2Id] += 0.03;
+      }
+        if (i<=-9){
+           theta[bodyId] = 0;
+           theta[head1Id] = -50;
+           theta[head2Id] = 80;
+        }
+      initNodes(bodyId);
+      initNodes(headId);
+      t = (translate(i, 0.0, 0.0));
+      t = mult(t, rotate(theta[bodyId], 0, 1, 0));
+      figure[bodyId] = createNode(t, body, null, headId);
+      // document.write("------theta:-------" + theta[head1Id] + "----i:---" + i + "-------");
+      if(theta[upperFLLId] == 205)
+	  {
+        Sequence = 0;
+   }
+  }
+ }
+}
 
 var render = function() {
 
