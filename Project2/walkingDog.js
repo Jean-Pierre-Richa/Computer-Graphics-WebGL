@@ -11,6 +11,11 @@ var modelViewMatrixLoc;
 
 var instanceMatrix;
 
+
+var flag = true;
+
+
+
 var vertices = [
 
   vec4(-0.5, -0.5,  0.5, 1.0),
@@ -49,7 +54,7 @@ var tailId     = 11;
 // RLH = Rear Leg Height
 // RLW = Rear Leg Width
 
-var headH    = 2.3;
+var headH    = 1.5;
 var headW    = 0.7;
 var bodyH    = 1.3;
 var bodyW    = 4.0;
@@ -70,9 +75,9 @@ var numNodes = 11;
 
 
 // Angles of the body parts
-// var theta = [0, 0, -80, -25, -80, -25, -80, -25, -80, -25, 180, 140];
-var theta = [0, -50, 185, -20, 185, -20, 185, -20, 185, -20, 80, 40];
-var numVertices = 24;
+
+var theta = [0, 50, 185, -20, 185, -20, 185, -20, 185, -20, 80, 40];
+// var numVertices = 24;
 // Stacking the modelViewMatrices
 var stack = [];
 // Figure for each body part to create a node and render it
@@ -119,7 +124,7 @@ function initNodes(Id){
     case headId:
     case head1Id:
     case head2Id:
-    t = translate(bodyW*0.55, 0.8*bodyH, 0.0);
+    t = translate(bodyW*0.55 + 0.2*headW, 0.8*bodyH, 0.0);
     t = mult(t, rotate(theta[head1Id], 0, 1, 0));
     t = mult(t, rotate(theta[head2Id], 0, 0, 1));
     t = mult(t, translate(0.0, -0.5 * headH, 0.0));
@@ -199,7 +204,7 @@ function body() {
     instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5 * bodyH, 0.0));
     instanceMatrix = mult(instanceMatrix, scale4(bodyW, bodyH, bodyW));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
-    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 4);
+    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4 * i, 4);
 }
 
 function head() {
@@ -207,7 +212,7 @@ function head() {
   instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5 * headH, 0.0));
 	instanceMatrix = mult(instanceMatrix, scale4(headW, headH, headW));
   gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
-  for (var i = 0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4 * i, 4);
+  for (var i = 0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 2 * i, 4);
 }
 
 function upperFLL(){
@@ -279,14 +284,102 @@ function tail() {
   instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5 * tailH, 0.0));
 	instanceMatrix = mult(instanceMatrix, scale4(tailW, tailH, tailW));
   gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
-  for (var i = 0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4 * i, 4);
+  for (var i = 0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 2 * i, 4);
 }
 
+
+var texSize = 256;
+var texture1, texture2;
+var t1, t2;
+var c;
+var numChecks = 8;
+
+var image1 = new Uint8Array(4*texSize*texSize);
+
+    for (var i = 0; i < texSize; i++){
+      for (var j = 0; j < texSize; j++){
+        var patchx = Math.floor(i/(texSize/numChecks));
+        var patchy = Math.floor(j/(texSize/numChecks));
+        if(patchx%2^patchy%2) c = 255;
+        else c = 0;
+        image1[4*i*texSize+4*j] = c;
+        image1[4*i*texSize+4*j+1] = c;
+        image1[4*i*texSize+4*j+2] = c;
+        image1[4*i*texSize+4*j+3] = 255;
+      }
+    }
+
+
+var image2 = new Uint8Array(4*texSize*texSize);
+
+    for (var i = 0; i < texSize; i++){
+      for ( var j = 0; j <texSize; j++ ) {
+        // if (j<(texSize/2)){
+            image2[4*i*texSize+4*j] = j;
+            image2[4*i*texSize+4*j+1] = j;
+            image2[4*i*texSize+4*j+2] = j;
+            image2[4*i*texSize+4*j+3] = 255;
+    }
+}
+
+var texCoordsArray = [];
+var colorsArray = [];
+
+var texCoord = [
+    vec2(0, 0),
+    vec2(0, 1),
+    vec2(1, 1),
+    vec2(1, 0)
+];
+
+var vertexColors = [
+  vec4( 0.0, 0.0, 0.0, 1.0 ),  // black
+  vec4( 0.0, 1.0, 1.0, 1.0 ),  // magenta
+  vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
+  vec4( 0.0, 1.0, 0.0, 1.0 ),  // green
+  vec4( 0.0, 1.0, 1.0, 1.0 ),  // blue
+  vec4( 1.0, 0.0, 0.0, 1.0 ),  // red
+  vec4( 0.0, 1.0, 1.0, 1.0 ),  // white
+  vec4( 0.0, 1.0, 1.0, 1.0 )   // cyan
+];
+
+function configureTexture() {
+    texture1 = gl.createTexture();
+    gl.bindTexture( gl.TEXTURE_2D, texture1 );
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, texSize, texSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, image1);
+    gl.generateMipmap( gl.TEXTURE_2D );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
+                      gl.NEAREST_MIPMAP_LINEAR );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+    texture2 = gl.createTexture();
+    gl.bindTexture( gl.TEXTURE_2D, texture2 );
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, texSize, texSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, image2);
+    gl.generateMipmap( gl.TEXTURE_2D );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
+                      gl.NEAREST_MIPMAP_LINEAR );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+}
+
+
+
+
 function quad(a, b, c, d){
+
   pointsArray.push(vertices[a]);
+  colorsArray.push(vertexColors[c]);
+  texCoordsArray.push(texCoord[0]);
   pointsArray.push(vertices[b]);
+  colorsArray.push(vertexColors[c]);
+  texCoordsArray.push(texCoord[1]);
   pointsArray.push(vertices[c]);
+  colorsArray.push(vertexColors[c]);
+  texCoordsArray.push(texCoord[2]);
   pointsArray.push(vertices[d]);
+  colorsArray.push(vertexColors[c]);
+  texCoordsArray.push(texCoord[3]);
 }
 
 function cube(){
@@ -296,6 +389,7 @@ function cube(){
   quad(6, 5, 1, 2);
   quad(4, 5, 6, 7);
   quad(5, 4, 0, 1);
+
 }
 
 window.onload = function init() {
@@ -321,24 +415,52 @@ window.onload = function init() {
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix")
     cube();
 
-    vBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW);
+    var cBuffer = gl.createBuffer();
+      gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
+      gl.bufferData( gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW );
 
-    var vPosition = gl.getAttribLocation( program, "vPosition" );
-    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( vPosition );
+      var vColor = gl.getAttribLocation( program, "vColor" );
+      gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
+      gl.enableVertexAttribArray( vColor );
 
+      var vBuffer = gl.createBuffer();
+      gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer);
+      gl.bufferData( gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW );
+
+      var vPosition = gl.getAttribLocation( program, "vPosition" );
+      gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
+      gl.enableVertexAttribArray( vPosition );
+
+      var tBuffer = gl.createBuffer();
+      gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer);
+      gl.bufferData( gl.ARRAY_BUFFER, flatten(texCoordsArray), gl.STATIC_DRAW );
+
+      var vTexCoord = gl.getAttribLocation( program, "vTexCoord" );
+      gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 );
+      gl.enableVertexAttribArray( vTexCoord );
+
+      configureTexture();
+
+      gl.activeTexture( gl.TEXTURE0 );
+      gl.bindTexture( gl.TEXTURE_2D, texture1 );
+      gl.uniform1i(gl.getUniformLocation( program, "Tex0"), 0);
+
+      gl.activeTexture( gl.TEXTURE1 );
+      gl.bindTexture( gl.TEXTURE_2D, texture2 );
+      gl.uniform1i(gl.getUniformLocation( program, "Tex1"), 1);
 
     document.getElementById("slider0").onchange = function(event) {
       theta[bodyId ] = event.target.value;
       initNodes(bodyId);
   };
 
-    document.getElementById("walkButton").onclick = function(){
-      clear();
-      walk();
-      }
+
+      document.getElementById("walkButton").onclick = function (){
+        // speed = 10;
+        clear();
+        walk();
+        }
+
 
     for(i = 0; i<=numNodes; i++) initNodes(i);
     render();
@@ -386,9 +508,12 @@ function walkLoop()
 
       if(theta[bodyId] == 0){
         i += 0.03;
-        theta[head1Id] -= 0.08;
-        theta[head2Id] += 0.03;
-
+        if(theta[head1Id]<90){
+        theta[head1Id] += 0.2;
+      }
+        if(theta[head2Id]<90){
+        theta[head2Id] += 0.1;
+      }
       }
         if (i>=9){
            theta[bodyId] = 180;
@@ -397,18 +522,23 @@ function walkLoop()
         }
       if(theta[bodyId] == 180){
         i -= 0.03;
-        theta[head1Id] += 0.08;
-        theta[head2Id] += 0.03;
+        if(theta[head1Id]<90){
+        theta[head1Id] += 0.2;
+      }
+        if(theta[head2Id]<90){
+        theta[head2Id] += 0.1;
+      }
       }
         if (i<=-9){
            theta[bodyId] = 0;
-           theta[head1Id] = -50;
+           theta[head1Id] = 50;
            theta[head2Id] = 80;
         }
       initNodes(bodyId);
       initNodes(headId);
       t = (translate(i, 0.0, 0.0));
       t = mult(t, rotate(theta[bodyId], 0, 1, 0));
+      // t = mult(t, rotate(theta[bodyId], 0, 0, 1));
       figure[bodyId] = createNode(t, body, null, headId);
       // document.write("------theta:-------" + theta[head2Id] + "----i:---" + i + "-------");
 
@@ -441,9 +571,12 @@ function walkLoop()
 
       if(theta[bodyId] == 0){
         i += 0.03;
-        theta[head1Id] -= 0.08;
-        theta[head2Id] += 0.03;
-
+        if(theta[head1Id]<90){
+        theta[head1Id] += 0.2;
+      }
+        if(theta[head2Id]<90){
+        theta[head2Id] += 0.1;
+      }
       }
         if (i>=9){
            theta[bodyId] = 180;
@@ -452,18 +585,23 @@ function walkLoop()
         }
       if(theta[bodyId] == 180){
         i -= 0.03;
-        theta[head1Id] += 0.08;
-        theta[head2Id] += 0.03;
+        if(theta[head1Id]<90){
+        theta[head1Id] += 0.2;
+      }
+        if(theta[head2Id]<90){
+        theta[head2Id] += 0.1;
+      }
       }
         if (i<=-9){
            theta[bodyId] = 0;
-           theta[head1Id] = -50;
+           theta[head1Id] = 50;
            theta[head2Id] = 80;
         }
       initNodes(bodyId);
       initNodes(headId);
       t = (translate(i, 0.0, 0.0));
       t = mult(t, rotate(theta[bodyId], 0, 1, 0));
+      // t = mult(t, rotate(theta[bodyId], 0, 0, 1));
       figure[bodyId] = createNode(t, body, null, headId);
       // document.write("------theta:-------" + theta[head1Id] + "----i:---" + i + "-------");
       if(theta[upperFLLId] == 205)
