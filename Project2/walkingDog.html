@@ -33,9 +33,7 @@ uniform sampler2D Tex1;
 
 void main()
 {
-    // gl_FragColor = vec4(0.2, 0.2, 0.8, 1.0);
     gl_FragColor = fColor*(texture2D(Tex0, fTexCoord)*texture2D(Tex1, fTexCoord));
-
 }
 </script>
 
@@ -46,15 +44,6 @@ void main()
 <script type="text/javascript" src="../Common/MV.js"></script>
 <script type="text/javascript" src="walkingDog.js"></script>
 
-
-
-
-<div>
-torso angle -180 <input id="slider0" type="range"
- min="-180" max="180" step="10" value="0"
-  />
- 180
-</div><br/>
 
 <button id = "walkButton">walk</button>
 

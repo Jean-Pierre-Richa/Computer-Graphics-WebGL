@@ -100,6 +100,8 @@ function scale4(a, b, c){
   return result;
 }
 
+// Problem 1: creating the Hierarchical Structure
+
 function createNode(transform, render, sibling, child){
   var node = {
   transform: transform,
@@ -116,7 +118,7 @@ function initNodes(Id){
     switch(Id){
 
     case bodyId:
-    // t = (translate(-10.0, 0.0, 0.0));
+    t = (translate(-10.0, 0.0, 0.0));
     t = mult(t, rotate(theta[bodyId], 0, 1, 0));
     figure[bodyId] = createNode(t, body, null, headId);
     break;
@@ -288,6 +290,8 @@ function tail() {
 }
 
 
+// Problem 2: creating the checkerboard texture
+
 var texSize = 256;
 var texture1, texture2;
 var t1, t2;
@@ -363,9 +367,6 @@ function configureTexture() {
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 }
 
-
-
-
 function quad(a, b, c, d){
 
   pointsArray.push(vertices[a]);
@@ -381,6 +382,7 @@ function quad(a, b, c, d){
   colorsArray.push(vertexColors[c]);
   texCoordsArray.push(texCoord[3]);
 }
+
 
 function cube(){
   quad(1, 0, 3, 2);
@@ -449,22 +451,24 @@ window.onload = function init() {
       gl.bindTexture( gl.TEXTURE_2D, texture2 );
       gl.uniform1i(gl.getUniformLocation( program, "Tex1"), 1);
 
-    document.getElementById("slider0").onchange = function(event) {
-      theta[bodyId ] = event.target.value;
-      initNodes(bodyId);
-  };
-
 
       document.getElementById("walkButton").onclick = function (){
         // speed = 10;
         clear();
         walk();
+        myFunction();
         }
+        function myFunction() {
+            document.getElementById('walkButton').disabled = true;
+        }
+
 
 
     for(i = 0; i<=numNodes; i++) initNodes(i);
     render();
 }
+
+// Problem 3: dog animation
 
 function clear(){
     Sequence = 2;
@@ -505,7 +509,8 @@ function walkLoop()
       initNodes(tailId);
 
 
-
+    // if the orientation is to the right, increase i(the position),
+    // and rotate the head in the viewer direction
       if(theta[bodyId] == 0){
         i += 0.03;
         if(theta[head1Id]<90){
@@ -515,11 +520,15 @@ function walkLoop()
         theta[head2Id] += 0.1;
       }
       }
+    // when you reach the end of the canvas (right side), change
+    // orientation to the left and set the head to the default position
         if (i>=9){
            theta[bodyId] = 180;
            theta[head1Id] = 50;
            theta[head2Id] = 80;
         }
+    // if the orientation is to the left, increase i(the position),
+    // and rotate the head in the viewer direction
       if(theta[bodyId] == 180){
         i -= 0.03;
         if(theta[head1Id]<90){
@@ -529,6 +538,8 @@ function walkLoop()
         theta[head2Id] += 0.1;
       }
       }
+    // when you reach the beginning of the canvas (left side), change
+    // orientation to the right and set the head to the default position
         if (i<=-9){
            theta[bodyId] = 0;
            theta[head1Id] = 50;
@@ -538,7 +549,6 @@ function walkLoop()
       initNodes(headId);
       t = (translate(i, 0.0, 0.0));
       t = mult(t, rotate(theta[bodyId], 0, 1, 0));
-      // t = mult(t, rotate(theta[bodyId], 0, 0, 1));
       figure[bodyId] = createNode(t, body, null, headId);
       // document.write("------theta:-------" + theta[head2Id] + "----i:---" + i + "-------");
 
@@ -568,7 +578,7 @@ function walkLoop()
       theta[tailId] += 2;
       initNodes(tailId);
 
-
+// same as above
       if(theta[bodyId] == 0){
         i += 0.03;
         if(theta[head1Id]<90){
@@ -601,7 +611,6 @@ function walkLoop()
       initNodes(headId);
       t = (translate(i, 0.0, 0.0));
       t = mult(t, rotate(theta[bodyId], 0, 1, 0));
-      // t = mult(t, rotate(theta[bodyId], 0, 0, 1));
       figure[bodyId] = createNode(t, body, null, headId);
       // document.write("------theta:-------" + theta[head1Id] + "----i:---" + i + "-------");
       if(theta[upperFLLId] == 205)
