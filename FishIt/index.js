@@ -2,7 +2,6 @@ var lighthouseId = 0;
 var boatId = 1;
 var rod1Id = 2;
 var rod2Id = 3;
-// var theta = [50, 60, 70]
 var numNodes = 3;
 var figure = [];
 var m = new THREE.Vector3();
@@ -27,13 +26,12 @@ function initNodes(Id){
 
   case lighthouseId:
   t = new THREE.Vector3(0, 0, 0);
-  // t = mult(t, rotate(theta[boatId], 0, 1, 0));
   figure[lighthouseId] = createNode(t, lighthousea, null, boatId);
   break;
 
   case boatId:
-  t1 = t.add(new THREE.Vector3(-270, -8, -600));
-  // t = mult(t, rotate(theta[boatId], 0, 1, 0));
+  t1 = t.add(new THREE.Vector3(270, -11, 600));
+  // t1=rotateY(90)
   figure[boatId] = createNode(t1, boata, rod1Id, null);
   break;
 
@@ -46,7 +44,7 @@ function initNodes(Id){
   t3 = t2.add(new THREE.Vector3(0, 0, 0));
   figure[rod2Id] = createNode(t3, rodb, null, null);
   break;
-}
+  }
 }
 
 function traverse(Id){
@@ -54,12 +52,13 @@ function traverse(Id){
   if(Id == null) return;
   stack.push(m);
   m.dot(figure[Id].transform)
-  // = mult(m, figure[Id].transform);
   figure[Id].render();
   if (figure[Id].child != null) traverse(figure[Id].child);
     m = stack.pop();
   if (figure[Id].sibling != null) traverse(figure[Id].sibling);
 }
+
+
 // Converts from degrees to radians.
 Math.radians = function (degrees) {
     return degrees * Math.PI / 180;
@@ -87,7 +86,6 @@ scene.fog = new THREE.Fog(0xcce0ff, 500, 10000);
 ///////////////////
 
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 100000);
-camera.position.set(159, 10, 552);
 // camera.position.set(-43, 872, 506);
 var controls = new THREE.OrbitControls(camera);
 controls.update();
@@ -147,6 +145,8 @@ light.shadow.mapSize.height = 512; // default
 light.shadow.camera.near = 0.5; // default
 light.shadow.camera.far = 500 // default
 
+
+//}
 ///////////////////
 //WATER
 ///////////////////
@@ -308,19 +308,20 @@ function lighthousea(){
 function boata(){
   loader.load(
       // resource URL
-      '/models/boat/scene.gltf',
+      '/models/boat/scene1.gltf',
       // called when the resource is loaded
       function (gltf) {
 
-          //gltf.scene.rotation.z = 180;
 
-          boat = gltf.scene;
+
+          boat = THREE.Object3D.prototype.clone.call(gltf.scene);
           boat.castShadow = true;
           boat.name = "boat";
           // boat.position.set(270, -8, 600);
           boat.position.set(t1.x, t1.y, t1.z);
           boat.scale.set(10, 10, 10);
-          //gltf.scene.rotation.y = 0.78
+          // gltf.scene.rotation.y = 0.78;
+          boat.rotation.y = Math.PI/180;
 
 
 
@@ -357,6 +358,7 @@ function boata(){
 
       }
   );
+
 }
 function roda(){
   loader.load(
@@ -364,11 +366,12 @@ function roda(){
       '/models/rod/rod1.gltf',
       // called when the resource is loaded
       function (gltf) {
-          rod1 = gltf.scene;
-          // rod1.rotation.x = -0.3;
+          rod1 = THREE.Object3D.prototype.clone.call(gltf.scene);
+          rod1.rotation.x = -2;
 
           // rod1.position.set(170, 5, 565);
-          rod1.position.set(t2.x-100, t2.y+12, t2.z-30);
+          rod1.position.set(t2.x-15, t2.y+15, t2.z-10);
+          // rod1.position.set(t2.x, t2.y, t2.z);
           rod1.scale.set(5, 5, 5);
           rod1.castShadow = true;
 
@@ -405,16 +408,19 @@ function roda(){
 
       }
   );
+
 }
+
 function rodb(){
   loader.load(
       '/models/rod/rod2.gltf',
       function (gltf) {
-          rod2 = gltf.scene;
-          // rod2.rotation.x = -50;
+          rod2 = THREE.Object3D.prototype.clone.call(gltf.scene);
+          rod2.rotation.x = -1.6;
           // rod2.position.set(170, 4.5, 565);
-          rod2.position.set(t3.x-100, t3.y+12, t3.z-30);
-          rod2.scale.set(5, 5, 5);
+          rod2.position.set(t3.x-15, t3.y+7.5, t3.z-11.2);
+          // rod2.position.set(t3.x, t3.y, t3.z);
+          rod2.scale.set(5, 5, 9);
           rod2.castShadow = true;
           scene.add(rod2);
       },
@@ -487,6 +493,7 @@ loader.load(
         console.log('An error happened');
     }
 );
+
 
 //var delta = 0;
 
@@ -594,9 +601,80 @@ var animate = function () {
 };
 animate();
 
+
+var map = {87 : false, 83 : false, 65 : false, 68 : false, 70 : false, 71 : false};
+document.addEventListener("keydown", keyDownTextField, false);
+
+function keyDownTextField(e) {
+  var xSpeed =6;
+  var zSpeed = 6;
+  var rota = 2*Math.PI/180;
+  var bpos = boat.position;
+  var brot = boat.rotation;
+  var cpos = camera.position;
+  var crot = camera.rotation;
+  var cos = Math.cos;
+  var sin = Math.sin;
+    if (e.keyCode in map) {
+        map[e.keyCode] = true;
+        if (map[87] && map[65]) {
+          bpos.z = bpos.z - sin(brot.y)*zSpeed;
+          bpos.x = bpos.x + cos(brot.y)*xSpeed;
+          brot.y += rota;
+          // scene.add(boat);
+        }
+        else if (map[87] && map[68]) {
+          bpos.z = bpos.z - sin(brot.y)*zSpeed;
+          bpos.x = bpos.x + cos(brot.y)*xSpeed;
+          brot.y -= rota;
+        }
+        else if (map[87]) {
+          bpos.z = bpos.z - sin(brot.y)*zSpeed;
+          bpos.x = bpos.x + cos(brot.y)*xSpeed;
+        }
+        else if (map[83] && map[65]) {
+          bpos.z = bpos.z + sin(brot.y)*zSpeed;
+          bpos.x = bpos.x - cos(brot.y)*xSpeed;
+          brot.y -= rota;
+          // scene.add(boat);
+        }
+        else if (map[83] && map[68]) {
+          bpos.z = bpos.z + sin(brot.y)*zSpeed;
+          bpos.x = bpos.x - cos(brot.y)*xSpeed;
+          brot.y += rota;
+        }
+        else if (map[83]) {
+          bpos.z = bpos.z + sin(brot.y)*zSpeed;
+          bpos.x = bpos.x - cos(brot.y)*xSpeed;
+        }
+        else if (map[70]){
+          crot.y = brot.y;
+        }
+      cpos.x = bpos.x;
+      cpos.y = bpos.y+15;
+      cpos.z = bpos.z;
+      crot.x = brot.x;
+      crot.y = brot.y - (90*Math.PI/180);
+      crot.z = brot.z;
+
+    }
+  }
+
+document.onkeyup = myKeyUpHandler;
+function myKeyUpHandler(e) {
+  var brot = boat.rotation;
+  var crot = camera.rotation;
+    if (e.keyCode in map) {
+        map[e.keyCode] = false;
+        crot.y = brot.y;
+    }
+};
+
 var render = function(){
   traverse(lighthouseId);
+  camera.position.set(t1.x-15, t1.y+15, t1.z);
   requestAnimationFrame(animate);
+
 }
 for(i = 0; i<=numNodes; i++) initNodes(i);
     render();

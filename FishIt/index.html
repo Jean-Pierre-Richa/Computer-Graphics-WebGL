@@ -29,8 +29,15 @@
     <script src="js/loaders/OBJLoader.js"></script>
     <script src="js/loaders/DDSLoader.js"></script>
     <script src="js/loaders/FBXLoader.js"></script>
-    <script src="js/MV.js"></script>
     <script src="js/PointerLockControls.js"></script>
-    <script type="text/javascript" src="index.js"></script>
+    <!-- <script type="text/javascript" src="index.js"></script> -->
+
+    <script type="text/javascript" language="javascript">
+    var versionUpdate = (new Date()).getTime();
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "index.js?v=" + versionUpdate;  
+    document.body.appendChild(script);
+</script>
 </body>
 </html>
