@@ -20,9 +20,7 @@ function createNode(transform, render, sibling, child){
 
 function initNodes(Id){
 
-  // var t = new THREE.Vector3(0, 0, 0);
   switch(Id){
-
 
   case lighthouseId:
   t = new THREE.Vector3(0, 0, 0);
@@ -31,13 +29,12 @@ function initNodes(Id){
 
   case boatId:
   t1 = t.add(new THREE.Vector3(270, -11, 600));
-  // t1=rotateY(90)
-  figure[boatId] = createNode(t1, boata, rod1Id, null);
+  figure[boatId] = createNode(t1, boata, null, rod1Id);
   break;
 
   case rod1Id:
   t2 = t1.add(new THREE.Vector3(0, 0, 0));
-  figure[rod1Id] = createNode(t2, roda, rod2Id, null);
+  figure[rod1Id] = createNode(t2, roda, null, rod2Id);
   break;
 
   case rod2Id:
@@ -314,7 +311,8 @@ function boata(){
 
 
 
-          boat = THREE.Object3D.prototype.clone.call(gltf.scene);
+          // boat = THREE.Object3D.prototype.clone.call(gltf.scene);
+          boat = gltf.scene;
           boat.castShadow = true;
           boat.name = "boat";
           // boat.position.set(270, -8, 600);
@@ -418,7 +416,7 @@ function rodb(){
           rod2 = THREE.Object3D.prototype.clone.call(gltf.scene);
           rod2.rotation.x = -1.6;
           // rod2.position.set(170, 4.5, 565);
-          rod2.position.set(t3.x-15, t3.y+7.5, t3.z-11.2);
+          rod2.position.set(t3.x-14.5, t3.y+7.3, t3.z-11.2);
           // rod2.position.set(t3.x, t3.y, t3.z);
           rod2.scale.set(5, 5, 9);
           rod2.castShadow = true;
@@ -532,15 +530,9 @@ function movimentoPesce(oggetto) {
                 //}, 100);
             }
         }
-
-
     }
     fishFlag = true;
 }
-
-
-
-
 /* setTimeout(function(){
         for (var p = 0; p < pesce.length; p++){
 
@@ -567,7 +559,13 @@ function polarToCartesian(radius, angle) {
 }
 
 var animate = function () {
-    requestAnimationFrame(animate);
+
+
+    setTimeout( function() {
+
+        requestAnimationFrame( animate );
+
+    }, 1000 / 40 );
 
     /* for (var p = 0; p < pesce.length; p++) {
         movimentoPesce(pesce[p], Math.radians(Math.floor(Math.random() * 360) - 180));
@@ -601,18 +599,21 @@ var animate = function () {
 };
 animate();
 
-
 var map = {87 : false, 83 : false, 65 : false, 68 : false, 70 : false, 71 : false};
 document.addEventListener("keydown", keyDownTextField, false);
 
 function keyDownTextField(e) {
-  var xSpeed =6;
-  var zSpeed = 6;
+  var xSpeed =10;
+  var zSpeed = 10;
   var rota = 2*Math.PI/180;
   var bpos = boat.position;
   var brot = boat.rotation;
   var cpos = camera.position;
   var crot = camera.rotation;
+  var r1pos = rod1.position;
+  var r2pos = rod2.position;
+  var r1rot = rod1.rotation;
+  var r2rot = rod2.rotation;
   var cos = Math.cos;
   var sin = Math.sin;
     if (e.keyCode in map) {
@@ -647,16 +648,29 @@ function keyDownTextField(e) {
           bpos.z = bpos.z + sin(brot.y)*zSpeed;
           bpos.x = bpos.x - cos(brot.y)*xSpeed;
         }
-        else if (map[70]){
-          crot.y = brot.y;
+
+        if (boat.position.z <= -940 || boat.position.x <= -940 || boat.position.z >= 940 || boat.position.x >= 940){
+          brot.y += 90*Math.PI/180;
         }
       cpos.x = bpos.x;
       cpos.y = bpos.y+15;
       cpos.z = bpos.z;
-      crot.x = brot.x;
       crot.y = brot.y - (90*Math.PI/180);
-      crot.z = brot.z;
+      r1pos.x = bpos.x + cos(brot.y)*xSpeed;
+      r1pos.z = bpos.z - sin(brot.y)*zSpeed;
+      r2pos.x = bpos.x + cos(brot.y)*xSpeed;
+      r2pos.z = bpos.z - 1 - sin(brot.y)*zSpeed;
+        if (map[71]){
+          r1rot.x = -2.7;
+          r2pos.y = r2pos.y - 7;
+        }
+        else if (map[70]){
+          r1rot.x = -2;
+          r2pos.y = r2pos.y+7;
+        }
 
+      // r1rot.z = brot.y;
+      // r2rot.z = brot.y;
     }
   }
 
@@ -666,10 +680,9 @@ function myKeyUpHandler(e) {
   var crot = camera.rotation;
     if (e.keyCode in map) {
         map[e.keyCode] = false;
-        crot.y = brot.y;
+        // crot.y = brot.y;
     }
 };
-
 var render = function(){
   traverse(lighthouseId);
   camera.position.set(t1.x-15, t1.y+15, t1.z);
