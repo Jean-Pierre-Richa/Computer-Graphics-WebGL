@@ -1,3 +1,4 @@
+// Building the hierarchical structure
 var lighthouseId = 0;
 var boatId = 1;
 var rod1Id = 2;
@@ -8,9 +9,9 @@ var figure = [];
 var m = new THREE.Vector3();
 var stack = [];
 var theta=[0, 0, 0.5, 0, 0];
-for (var i = 0; i<=numNodes; i++) figure[i] = createNode(null, null, null, null);
+for (var i = 0; i<=numNodes; i++) figure[i] = createNode(null, null, null, null); // create a node for each object
 
-function createNode(transform, render, sibling, child){
+function createNode(transform, render, sibling, child){ //node creation function for the hierarchical structure
   var node = {
   transform: transform,
   render: render,
@@ -79,9 +80,6 @@ var boat;
 var boatFlag = false;
 var fishFlag = false;
 
-
-
-
 var scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0xcce0ff, 500, 10000);
 
@@ -119,8 +117,6 @@ light.shadow.mapSize.height = 512; // default
 light.shadow.camera.near = 0.5; // default
 light.shadow.camera.far = 500 // default
 
-
-//}
 ///////////////////
 //WATER
 ///////////////////
@@ -203,7 +199,7 @@ scene.add(helper);
 //3D MODELS
 ///////////////////
 
-
+//Adding the Lighthouse (the function will be used when the new node for the lighthouse is created)
 var loader = new THREE.GLTFLoader();
 function lighthousea(){
   loader.load(
@@ -235,6 +231,7 @@ function lighthousea(){
       }
   );
 }
+//Adding the boat (the function will be used when the new node for the boat is created)
 function boata(){
   loader.load(
       // resource URL
@@ -268,6 +265,7 @@ function boata(){
   );
 
 }
+//Adding the rod handle (the function will be used when the new node for the rod handle is created)
 function roda(){
   loader.load(
       // resource URL
@@ -298,7 +296,7 @@ function roda(){
   );
 
 }
-
+//Adding the rod rope (the function will be used when the new node for the rod rope is created)
 function rodb(){
   loader.load(
       '/models/rod/rod14.gltf',
@@ -320,6 +318,7 @@ function rodb(){
       }
   );
 }
+//Adding the rod bait (the function will be used when the new node for the rod bait is created)
 function rodc(){
   loader.load(
       '/models/rod/rod15.gltf',
@@ -342,7 +341,7 @@ function rodc(){
   );
 }
 
-
+//Adding the fishes
 loader.load(
     // resource URL
     '/models/fish/scene.gltf',
@@ -435,6 +434,8 @@ var animate = function () {
 };
 animate();
 
+// Animating the boat
+// W, A, S, D keys are used to move the boat, and F, G are used to throw and pull the rod
 var map = {87 : false, 83 : false, 65 : false, 68 : false, 70 : false, 71 : false};
 document.addEventListener("keydown", keyDownTextField, false);
 
@@ -456,33 +457,31 @@ function keyDownTextField(e) {
   var sin = Math.sin;
     if (e.keyCode in map) {
         map[e.keyCode] = true;
-        if (map[87] && map[65]) {
+        if (map[87] && map[65]) { // forward + left movement
           bpos.z = bpos.z - sin(brot.y)*zSpeed;
           bpos.x = bpos.x + cos(brot.y)*xSpeed;
           brot.y += rota;
-          // scene.add(boat);
         }
-        else if (map[87] && map[68]) {
+        else if (map[87] && map[68]) { // forward + right movement
           bpos.z = bpos.z - sin(brot.y)*zSpeed;
           bpos.x = bpos.x + cos(brot.y)*xSpeed;
           brot.y -= rota;
         }
-        else if (map[87]) {
+        else if (map[87]) { // forward movement
           bpos.z = bpos.z - sin(brot.y)*zSpeed;
           bpos.x = bpos.x + cos(brot.y)*xSpeed;
         }
-        else if (map[83] && map[65]) {
+        else if (map[83] && map[65]) { // backward + left movement
           bpos.z = bpos.z + sin(brot.y)*zSpeed;
           bpos.x = bpos.x - cos(brot.y)*xSpeed;
           brot.y -= rota;
-          // scene.add(boat);
         }
-        else if (map[83] && map[68]) {
+        else if (map[83] && map[68]) { // backward + right movement
           bpos.z = bpos.z + sin(brot.y)*zSpeed;
           bpos.x = bpos.x - cos(brot.y)*xSpeed;
           brot.y += rota;
         }
-        else if (map[83]) {
+        else if (map[83]) { // backward movement
           bpos.z = bpos.z + sin(brot.y)*zSpeed;
           bpos.x = bpos.x - cos(brot.y)*xSpeed;
         }
@@ -503,14 +502,14 @@ function keyDownTextField(e) {
       r1rot.y = brot.y;
       r2rot.y = brot.y;
       r3rot.y = brot.y;
-        if (map[70]){
+        if (map[70]){ // pull the rod
           r1rot.x = 0;
           rod2.scale.set(5, 5, 5);
           r2pos.y = -6;
           r3pos.y = -6;
 
         }
-        if (map[71]){
+        if (map[71]){ // throw the rod
           r1rot.x = -0.5;
           rod2.scale.set(5, 10, 5);
           r2pos.z -= 2.5;
@@ -537,5 +536,6 @@ var render = function(){
   requestAnimationFrame(animate);
 
 }
+// create the nodes
 for(i = 0; i<=numNodes; i++) initNodes(i);
     render();
