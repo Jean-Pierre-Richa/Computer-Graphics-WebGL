@@ -2,10 +2,12 @@ var lighthouseId = 0;
 var boatId = 1;
 var rod1Id = 2;
 var rod2Id = 3;
-var numNodes = 3;
+var rod3Id = 4;
+var numNodes = 4;
 var figure = [];
 var m = new THREE.Vector3();
 var stack = [];
+var theta=[0, 0, 0.5, 0, 0];
 for (var i = 0; i<=numNodes; i++) figure[i] = createNode(null, null, null, null);
 
 function createNode(transform, render, sibling, child){
@@ -28,7 +30,7 @@ function initNodes(Id){
   break;
 
   case boatId:
-  t1 = t.add(new THREE.Vector3(270, -11, 600));
+  t1 = t.add(new THREE.Vector3(-270, -11, -600));
   figure[boatId] = createNode(t1, boata, null, rod1Id);
   break;
 
@@ -39,7 +41,12 @@ function initNodes(Id){
 
   case rod2Id:
   t3 = t2.add(new THREE.Vector3(0, 0, 0));
-  figure[rod2Id] = createNode(t3, rodb, null, null);
+  figure[rod2Id] = createNode(t3, rodb, null, rod3Id);
+  break;
+
+  case rod3Id:
+  t4 = t3.add(new THREE.Vector3(0, 0, 0));
+  figure[rod3Id] = createNode(t4, rodc, null, null);
   break;
   }
 }
@@ -86,36 +93,6 @@ var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHei
 // camera.position.set(-43, 872, 506);
 var controls = new THREE.OrbitControls(camera);
 controls.update();
-// controls.enableZoom = false;
-//controls.enablePan = false;
-//controls.enabled = false;
-
-
-// camera.lookAt(0,0,0);
-// window.addEventListener('mousemove', function(e){
-//     var mouse3D = new THREE.Vector3(
-//     (( event.clientX / window.innerWidth ) * 2 - 1)*300,
-//     (- ( event.clientY / window.innerHeight ) * 2 + 1)*300,
-//     0.5 );
-//     camera.lookAt(mouse3D);
-// });
-//
-
-
-
-/* var mouseX;
-var mouseY;
-window.addEventListener('mouseMove', function(event){
-    mouseX = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouseY = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    camera.position.x += ( mouseX - camera.position.x ) ;
-    camera.position.y += ( - mouseY - camera.position.y ) ;
-    camera.lookAt( scene.position );
-}) */
-
-/* var looking = new THREE.PointerLockControls( camera );
-scene.add( looking.getObject() ); */
-//looking.enabled = true; // Turns on camera rotating with mouse
 
 ///////////////////
 //LIGHTS & SHADOWS
@@ -219,30 +196,8 @@ uniforms.sunPosition.value.copy(sunSphere.position);
 //CAMERA
 ///////////////////
 
-
-/* var geometry = new THREE.BoxGeometry(1, 1, 1);
-var material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
-var cube = new THREE.Mesh(geometry, material);
-scene.add(cube); */
-
-
-//camera.position.y = 5;
-//camera.lookAt(mouse3D);
-
-
 var helper = new THREE.CameraHelper(light.shadow.camera);
 scene.add(helper);
-
-//var r = 0;
-
-//Create a plane that receives shadows (but does not cast them)
-/* var planeGeometry = new THREE.PlaneBufferGeometry(1320, 1320, 1332, 1332);
-var planeMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
-var plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.rotation.x = 5;
-plane.receiveShadow = true;
-scene.add(plane); */
-
 
 ///////////////////
 //3D MODELS
@@ -256,34 +211,12 @@ function lighthousea(){
       '/models/lighthouse/model.gltf',
       // called when the resource is loaded
       function (gltf) {
-
           //gltf.scene.rotation.z = 180;
-
           var lighthouse = gltf.scene;
           lighthouse.castShadow = true;
           lighthouse.name = "lighthouse";
           lighthouse.position.set(0, -10, 0);
-          // lighthouse.position.set(t.x, t.y, t.z);
-          // gltf.scene.scale.set(10, 10, 10)
-          //gltf.scene.rotation.y = 0.78
-
-
-
-          /* var material = materials[ 0 ];
-      var object = new THREE.Mesh( geometry, material );
-          object.castShadow = true;
-          object.position.y = 550;
-          object.scale.set(0.05, 0.05, 0.05);*/
-
-
           scene.add(lighthouse);
-
-          /* gltf.animations; // Array<THREE.AnimationClip>
-          gltf.scene; // THREE.Scene
-          gltf.scenes; // Array<THREE.Scene>
-          gltf.cameras; // Array<THREE.Camera>
-          gltf.asset; // Object */
-
       },
       // called while loading is progressing
       function (xhr) {
@@ -305,40 +238,17 @@ function lighthousea(){
 function boata(){
   loader.load(
       // resource URL
-      '/models/boat/scene1.gltf',
+      '/models/boat2/scene.gltf',
       // called when the resource is loaded
       function (gltf) {
-
-
-
-          // boat = THREE.Object3D.prototype.clone.call(gltf.scene);
           boat = gltf.scene;
           boat.castShadow = true;
           boat.name = "boat";
-          // boat.position.set(270, -8, 600);
-          boat.position.set(t1.x, t1.y, t1.z);
-          boat.scale.set(10, 10, 10);
-          // gltf.scene.rotation.y = 0.78;
+          boat.position.set(t1.x, t1.y+5, t1.z);
+          boat.scale.set(3, 3, 3);
           boat.rotation.y = Math.PI/180;
-
-
-
-          /* var material = materials[ 0 ];
-      var object = new THREE.Mesh( geometry, material );
-          object.castShadow = true;
-          object.position.y = 550;
-          object.scale.set(0.05, 0.05, 0.05);*/
-
-
           scene.add(boat);
           boatFlag = true;
-
-          /* gltf.animations; // Array<THREE.AnimationClip>
-          gltf.scene; // THREE.Scene
-          gltf.scenes; // Array<THREE.Scene>
-          gltf.cameras; // Array<THREE.Camera>
-          gltf.asset; // Object */
-
       },
       // called while loading is progressing
       function (xhr) {
@@ -361,37 +271,17 @@ function boata(){
 function roda(){
   loader.load(
       // resource URL
-      '/models/rod/rod1.gltf',
+      '/models/rod/rod13.gltf',
       // called when the resource is loaded
       function (gltf) {
           rod1 = THREE.Object3D.prototype.clone.call(gltf.scene);
-          rod1.rotation.x = -2;
-
+          // rod1.rotation.x = -2;
           // rod1.position.set(170, 5, 565);
-          rod1.position.set(t2.x-15, t2.y+15, t2.z-10);
+          rod1.position.set(t2.x, t2.y+5, t2.z);
           // rod1.position.set(t2.x, t2.y, t2.z);
           rod1.scale.set(5, 5, 5);
           rod1.castShadow = true;
-
-          //gltf.scene.position.y = 550;
-
-          //gltf.scene.scale.set(0.05, 0.05, 0.05);
-
-
-          /* var material = materials[ 0 ];
-      var object = new THREE.Mesh( geometry, material );
-          object.castShadow = true;
-          object.position.y = 550;
-          object.scale.set(0.05, 0.05, 0.05);*/
-
           scene.add(rod1);
-
-          /* gltf.animations; // Array<THREE.AnimationClip>
-          gltf.scene; // THREE.Scene
-          gltf.scenes; // Array<THREE.Scene>
-          gltf.cameras; // Array<THREE.Camera>
-          gltf.asset; // Object */
-
       },
       // called while loading is progressing
       function (xhr) {
@@ -411,16 +301,37 @@ function roda(){
 
 function rodb(){
   loader.load(
-      '/models/rod/rod2.gltf',
+      '/models/rod/rod14.gltf',
       function (gltf) {
           rod2 = THREE.Object3D.prototype.clone.call(gltf.scene);
-          rod2.rotation.x = -1.6;
+          // rod2.rotation.x = -1.6;
           // rod2.position.set(170, 4.5, 565);
-          rod2.position.set(t3.x-14.5, t3.y+7.3, t3.z-11.2);
+          rod2.position.set(t3.x, t3.y+5, t3.z);
           // rod2.position.set(t3.x, t3.y, t3.z);
-          rod2.scale.set(5, 5, 9);
+          rod2.scale.set(5, 5, 5);
           rod2.castShadow = true;
           scene.add(rod2);
+      },
+      function (xhr) {
+          console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+      },
+      function (error) {
+          console.log('An error happened');
+      }
+  );
+}
+function rodc(){
+  loader.load(
+      '/models/rod/rod15.gltf',
+      function (gltf) {
+          rod3 = THREE.Object3D.prototype.clone.call(gltf.scene);
+          // rod2.rotation.x = -1.6;
+          // rod2.position.set(170, 4.5, 565);
+          rod3.position.set(t4.x, t4.y+5, t4.z);
+          // rod2.position.set(t3.x, t3.y, t3.z);
+          rod3.scale.set(5, 5, 5);
+          rod3.castShadow = true;
+          scene.add(rod3);
       },
       function (xhr) {
           console.log((xhr.loaded / xhr.total * 100) + '% loaded');
@@ -443,42 +354,15 @@ loader.load(
 
         for (var i = 0; i < 100; i++) {
 
-            //gltf.scene.rotation.z = 180;
-
             x = THREE.Math.randFloatSpread(1000);
             z = THREE.Math.randFloatSpread(1000);
-
             gltf.scene.position.set(x, -20, z);
-            //console.log(gltf.scene.position);
             gltf.scene.name = "pesce" + i.toString();
-
             gltf.scene.rotation.y = Math.random();
-
-
-            //gltf.scene.position.y = 550;
-
-            //gltf.scene.scale.set(0.05, 0.05, 0.05);
-
-
-            /* var material = materials[ 0 ];
-            var object = new THREE.Mesh( geometry, material );
-            object.castShadow = true;
-            object.position.y = 550;
-            object.scale.set(0.05, 0.05, 0.05);*/
-
             pesce[i] = THREE.Object3D.prototype.clone.call(gltf.scene)
 
             scene.add(pesce[i]);
-            //fishFlag = true;
-
         }
-
-        /* gltf.animations; // Array<THREE.AnimationClip>
-        gltf.scene; // THREE.Scene
-        gltf.scenes; // Array<THREE.Scene>
-        gltf.cameras; // Array<THREE.Camera>
-        gltf.asset; // Object */
-
     },
     // called while loading is progressing
     function (xhr) {
@@ -493,8 +377,6 @@ loader.load(
 );
 
 
-//var delta = 0;
-
 ///////////////////
 //FISH MOVEMENT
 ///////////////////
@@ -502,8 +384,7 @@ loader.load(
 var xAxis = new THREE.Vector3(1, 0, 0);
 
 function movimentoPesce(oggetto) {
-    /* var randDegrees;
-    var randRadians; */
+
     fishFlag = false;
     for (var i = 0; i < oggetto.length; i++) {
         var randDegrees = Math.floor(Math.random() * 360) - 180;
@@ -514,7 +395,6 @@ function movimentoPesce(oggetto) {
             500 || oggetto[i].position.z + z < -500) {
             continue;
         }
-
         if (randRadians > oggetto[i].rotation.y) {
             while (randRadians > oggetto[i].rotation.y) {
                 //setTimeout(function () {
@@ -533,68 +413,24 @@ function movimentoPesce(oggetto) {
     }
     fishFlag = true;
 }
-/* setTimeout(function(){
-        for (var p = 0; p < pesce.length; p++){
-
-            pesce[p].rotateY(Math.radians(Math.floor(Math.random() * 360) - 180));
-            pesce[p].translateOnAxis(xAxis, 10);
-        //pesce[p].position.x -= 0.5;
-        //movimentoPesce(pesce[p], Math.radians(Math.floor(Math.random() * 360) - 180));
-        //pesce[p].position.x-=0.3
-        }
-        if (boatFlag){
-        boat.rotateY(0.017);
-        boat.translateOnAxis(diocane, 10);
-        }
-    }, 3000); */
 
 if (fishFlag) {
     setTimeout(function(){movimentoPesce(pesce);
     }, 100);
 
 }
-
 function polarToCartesian(radius, angle) {
     return [radius * Math.cos(angle), radius * Math.sin(angle)]
 }
-
 var animate = function () {
-
-
     setTimeout( function() {
-
         requestAnimationFrame( animate );
 
     }, 1000 / 40 );
-
-    /* for (var p = 0; p < pesce.length; p++) {
-        movimentoPesce(pesce[p], Math.radians(Math.floor(Math.random() * 360) - 180));
-    } */
-    /* if (fishFlag) {
-        setTimeout(function(){movimentoPesce(pesce);
-        }, 1000);
-
-    } */
-
     var time = performance.now() * 0.001;
     if (boatFlag) {
         boat.rotation.x = Math.sin(time) * 0.015;
-        //movimentoPesce(boat, 0.17)
-        //boat.position.y = Math.sin(time) * 20 + 5;
     }
-
-    //.movimentoPesce(Math.radians(Math.floor(Math.random() * 360) - 180));
-
-
-    //camera.lookAt(mouse3D);
-    /* delta += 0.01;
-
-        //camera.lookAt = light.position;
-        camera.position.x = Math.sin(delta) * 2000;
-        camera.position.z = Math.cos(delta) * 2000; */
-
-    /* cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;*/
     renderer.render(scene, camera);
 };
 animate();
@@ -612,8 +448,10 @@ function keyDownTextField(e) {
   var crot = camera.rotation;
   var r1pos = rod1.position;
   var r2pos = rod2.position;
+  var r3pos = rod3.position;
   var r1rot = rod1.rotation;
   var r2rot = rod2.rotation;
+  var r3rot = rod3.rotation;
   var cos = Math.cos;
   var sin = Math.sin;
     if (e.keyCode in map) {
@@ -653,24 +491,33 @@ function keyDownTextField(e) {
           brot.y += 90*Math.PI/180;
         }
       cpos.x = bpos.x;
-      cpos.y = bpos.y+15;
+      cpos.y = bpos.y+5;
       cpos.z = bpos.z;
       crot.y = brot.y - (90*Math.PI/180);
-      r1pos.x = bpos.x + cos(brot.y)*xSpeed;
-      r1pos.z = bpos.z - sin(brot.y)*zSpeed;
-      r2pos.x = bpos.x + cos(brot.y)*xSpeed;
-      r2pos.z = bpos.z - 1 - sin(brot.y)*zSpeed;
-        if (map[71]){
-          r1rot.x = -2.7;
-          r2pos.y = r2pos.y - 7;
-        }
-        else if (map[70]){
-          r1rot.x = -2;
-          r2pos.y = r2pos.y+7;
-        }
+      r1pos.x = bpos.x;
+      r1pos.z = bpos.z;
+      r2pos.x = bpos.x;
+      r2pos.z = bpos.z;
+      r3pos.x = bpos.x;
+      r3pos.z = bpos.z;
+      r1rot.y = brot.y;
+      r2rot.y = brot.y;
+      r3rot.y = brot.y;
+        if (map[70]){
+          r1rot.x = 0;
+          rod2.scale.set(5, 5, 5);
+          r2pos.y = -6;
+          r3pos.y = -6;
 
-      // r1rot.z = brot.y;
-      // r2rot.z = brot.y;
+        }
+        if (map[71]){
+          r1rot.x = -0.5;
+          rod2.scale.set(5, 10, 5);
+          r2pos.z -= 2.5;
+          r2pos.y = boat.position.y-11.5;
+          r3pos.y = r2pos.y-1;
+          r3pos.z = r2pos.z;
+        }
     }
   }
 
@@ -680,12 +527,13 @@ function myKeyUpHandler(e) {
   var crot = camera.rotation;
     if (e.keyCode in map) {
         map[e.keyCode] = false;
-        // crot.y = brot.y;
+        crot.y = brot.y;
+        // cpos.x = bpos.x-14;
     }
 };
 var render = function(){
   traverse(lighthouseId);
-  camera.position.set(t1.x-15, t1.y+15, t1.z);
+  camera.position.set(t1.x, t1.y+10, t1.z);
   requestAnimationFrame(animate);
 
 }
