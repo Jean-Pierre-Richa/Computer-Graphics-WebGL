@@ -5,6 +5,7 @@
     <link rel='icon' type='image/x-icon' href='/favicon.ico' />
     <meta charset=utf-8>
     <title>FishIT</title>
+    <link rel="stylesheet" type="text/css" href="css/index.css">
     <style>
         body {
             margin: 0;
@@ -30,14 +31,26 @@
     <script src="js/loaders/DDSLoader.js"></script>
     <script src="js/loaders/FBXLoader.js"></script>
     <script src="js/PointerLockControls.js"></script>
+    <script src="js/KeyboardState.js"></script>
+    <script src="js/libs/stats.min.js"></script>
     <!-- <script type="text/javascript" src="index.js"></script> -->
 
     <script type="text/javascript" language="javascript">
     var versionUpdate = (new Date()).getTime();
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src = "index.js?v=" + versionUpdate;  
+    script.src = "index.js?v=" + versionUpdate;
     document.body.appendChild(script);
+
 </script>
+<div id="container"><br /><br /><br /><br /><br />Loading...</div>
+
+<div id="progressBar">
+
+    <circular-progress-bar id="bar-1" barcolor="#EE5C42" filledcolor="#8B3626" progressStringFormat="Press SPACE"
+        displayTextWhenDone="false">
+    </circular-progress-bar>
+
+</div>
 </body>
 </html>
