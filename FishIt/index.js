@@ -39,33 +39,44 @@ for (var i = 0; i < numNodes; i++) figure[i] = createNode(null, null, null, null
 
 
 ///////////////////
-//HIERARCHY
+//BROWSER DETECTION
 ///////////////////
 
 function BrowserDetection() {
     //Check if browser is IE
     if (navigator.userAgent.search("MSIE") >= 0) {
         console.log("Explorer");
+        initSounds("ogg");
     }
     //Check if browser is Chrome
     else if (navigator.userAgent.search("Chrome") >= 0) {
         // insert conditional Chrome code here
         console.log("Chrome");
+        initSounds("ogg");
     }
     //Check if browser is Firefox 
     else if (navigator.userAgent.search("Firefox") >= 0) {
         // insert conditional Firefox Code here
         console.log("Firefox");
+        initSounds("ogg");
     }
     //Check if browser is Safari
     else if (navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") < 0) {
         // insert conditional Safari code here
         console.log("Safari");
+        initSounds("wav");
     }
     //Check if browser is Opera
     else if (navigator.userAgent.search("Opera") >= 0) {
         // insert conditional Opera code here
         console.log("Opera");
+        initSounds("ogg");
+    }
+
+    //    #cheating
+    else {
+        console.log("Safari??");
+        initSounds("wav");
     }
 }
 
@@ -181,7 +192,9 @@ function onWindowResize() {
 init();
 initBasicGraphics();
 //initCustomModels();
-initSounds();
+//initSounds();
+//initSounds Replaced called in browser detection
+BrowserDetection();
 
 function init() {
     ///////////////////
@@ -644,7 +657,7 @@ function collision(obj) {
     }
 }
 
-function initSounds() {
+function initSounds(extension) {
     var audioListener = new THREE.AudioListener();
     camera.add(audioListener);
 
@@ -657,7 +670,7 @@ function initSounds() {
 
     var loader = new THREE.AudioLoader();
     loader.load(
-        'sounds/whistle.mp3',
+        'sounds/whistle.' + extension,
         function (audioBuffer) {
             whistle.setBuffer(audioBuffer);
             whistle.setLoop(true);
@@ -673,7 +686,7 @@ function initSounds() {
     );
 
     loader.load(
-        'sounds/cast.mp3',
+        'sounds/cast.' + extension,
         function (audioBuffer) {
             cast.setBuffer(audioBuffer);
             cast.setVolume(1.25);
@@ -687,7 +700,7 @@ function initSounds() {
     );
 
     loader.load(
-        'sounds/pullup.mp3',
+        'sounds/pullup.'  + extension,
         function (audioBuffer) {
             pullup.setBuffer(audioBuffer);
             pullup.setVolume(1.25);
