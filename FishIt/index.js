@@ -625,7 +625,7 @@ function initSounds() {
 
     var loader = new THREE.AudioLoader();
     loader.load(
-        'sounds/whistle.ogg',
+        'sounds/whistle.mp3',
         function (audioBuffer) {
             whistle.setBuffer(audioBuffer);
             whistle.setLoop(true);
@@ -641,7 +641,7 @@ function initSounds() {
     );
 
     loader.load(
-        'sounds/cast.ogg',
+        'sounds/cast.mp3',
         function (audioBuffer) {
             cast.setBuffer(audioBuffer);
             cast.setVolume(1.25);
@@ -655,7 +655,7 @@ function initSounds() {
     );
 
     loader.load(
-        'sounds/pullup.ogg',
+        'sounds/pullup.mp3',
         function (audioBuffer) {
             pullup.setBuffer(audioBuffer);
             pullup.setVolume(1.25);
@@ -686,6 +686,7 @@ var animate = function () {
         progress.style.visibility = 'visible';
         bar.style.visibility = 'visible';
         UpdateBars();
+
         quickTime = false;
         pressSpace = true;
     }
@@ -705,16 +706,14 @@ var animate = function () {
 
     if (pressSpace) {
         if (keyboard.down("space")) {
-            //endQTEvent();
+            endQTEvent();
             pullup.play();
-            map[70];
-            map[71];
-            console.log("got it!");
             collisi = true;
             updateScore(collisi);
+            console.log("got it!");
             bar.progress = 100;
 
-            //flag = true;
+            flag = true;
             pressSpace = false;
         }
     }
