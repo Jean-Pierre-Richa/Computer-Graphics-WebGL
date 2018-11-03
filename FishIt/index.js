@@ -37,6 +37,38 @@ var stack = [];
 var theta = [0, 0, 0.5, 0, 0];
 for (var i = 0; i < numNodes; i++) figure[i] = createNode(null, null, null, null); // create a node for each object
 
+
+///////////////////
+//HIERARCHY
+///////////////////
+
+function BrowserDetection() {
+    //Check if browser is IE
+    if (navigator.userAgent.search("MSIE") >= 0) {
+        console.log("Explorer");
+    }
+    //Check if browser is Chrome
+    else if (navigator.userAgent.search("Chrome") >= 0) {
+        // insert conditional Chrome code here
+        console.log("Chrome");
+    }
+    //Check if browser is Firefox 
+    else if (navigator.userAgent.search("Firefox") >= 0) {
+        // insert conditional Firefox Code here
+        console.log("Firefox");
+    }
+    //Check if browser is Safari
+    else if (navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") < 0) {
+        // insert conditional Safari code here
+        console.log("Safari");
+    }
+    //Check if browser is Opera
+    else if (navigator.userAgent.search("Opera") >= 0) {
+        // insert conditional Opera code here
+        console.log("Opera");
+    }
+}
+
 ///////////////////
 //HIERARCHY
 ///////////////////
@@ -706,14 +738,14 @@ var animate = function () {
 
     if (pressSpace) {
         if (keyboard.down("space")) {
-            endQTEvent();
+            //endQTEvent();
             pullup.play();
             collisi = true;
             updateScore(collisi);
             console.log("got it!");
             bar.progress = 100;
 
-            flag = true;
+            //flag = true;
             pressSpace = false;
         }
     }
@@ -755,7 +787,7 @@ var updateScore = function(collisi){
   		if (j == max) {
         clearInterval(interval);
   			alert("YOU WON");
-  			return;
+  			return;//endQTEvent
       }
 
       $('.circle_animation').css('stroke-dashoffset', initialOffset-((j+1)*(initialOffset/max)));
