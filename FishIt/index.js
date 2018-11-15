@@ -36,7 +36,7 @@ var m = new THREE.Vector3();
 var stack = [];
 var theta = [0, 0, 0.5, 0, 0];
 for (var i = 0; i < numNodes; i++) figure[i] = createNode(null, null, null, null); // create a node for each object
-
+var insideWater = false;
 
 ///////////////////
 //BROWSER DETECTION
@@ -483,14 +483,16 @@ function rodc() {
             rod3 = THREE.Object3D.prototype.clone.call(gltf.scene);
             // rod2.rotation.x = -1.6;
             // rod2.position.set(170, 4.5, 565);
-            rod3.position.set(t4.x, t4.y+5, t4.z);
+            rod3.position.set(t4.x, t4.y + 5, t4.z);
             // rod2.position.set(t3.x, t3.y, t3.z);
             rod3.scale.set(5, 5, 5);
             rod3.castShadow = true;
 
 
             //COLLISION BOXES
-            var params = { opacity: 0 };
+            var params = {
+                opacity: 0
+            };
             var center = new THREE.Vector3();
             var box = new THREE.Box3().setFromObject(rod3);
             var cubeGeometry = new THREE.BoxGeometry(box.getSize(center).x, box.getSize(center).y, box.getSize(
@@ -534,16 +536,18 @@ loader.load(
             pesce[i] = THREE.Object3D.prototype.clone.call(gltf.scene)
 
             //COLLISION BOXES
-            var params = { opacity: 0 };
+            var params = {
+                opacity: 0
+            };
             var center = new THREE.Vector3();
             var box = new THREE.Box3().setFromObject(pesce[i]);
             var cubeGeometry = new THREE.BoxGeometry(box.getSize(center).x, box.getSize(center).y, box.getSize(
                 center).z);
             var wireMaterial = new THREE.MeshBasicMaterial({
-              opacity: params.opacity,
-              transparent: true,
-              // color: 0xFFFFFF,
-              wireframe: true
+                opacity: params.opacity,
+                transparent: true,
+                // color: 0xFFFFFF,
+                wireframe: true
             });
             movingCubes[i] = new THREE.Mesh(cubeGeometry, wireMaterial);
             movingCubes[i].position.x = pesce[i].position.x;
@@ -700,7 +704,7 @@ function initSounds(extension) {
     );
 
     loader.load(
-        'sounds/pullup.'  + extension,
+        'sounds/pullup.' + extension,
         function (audioBuffer) {
             pullup.setBuffer(audioBuffer);
             pullup.setVolume(1.25);
@@ -789,24 +793,24 @@ render();
 var max = 100;
 var initialOffset = '175';
 var j = 0;
-var updateScore = function(collisi){
-  if(collisi == true){
-    j+=1;
-  /* Need initial run as interval hasn't yet occured... */
-  $('.circle_animation').css('stroke-dashoffset', initialOffset-(1*(initialOffset/max)));
+var updateScore = function (collisi) {
+    if (collisi == true) {
+        j += 1;
+        /* Need initial run as interval hasn't yet occured... */
+        $('.circle_animation').css('stroke-dashoffset', initialOffset - (1 * (initialOffset / max)));
 
-  var interval = setInterval(function() {
-  		$('h2').text(j);
-  		if (j == max) {
-        clearInterval(interval);
-  			alert("YOU WON");
-  			return;//endQTEvent
-      }
+        var interval = setInterval(function () {
+            $('h2').text(j);
+            if (j == max) {
+                clearInterval(interval);
+                alert("YOU WON");
+                return; //endQTEvent
+            }
 
-      $('.circle_animation').css('stroke-dashoffset', initialOffset-((j+1)*(initialOffset/max)));
+            $('.circle_animation').css('stroke-dashoffset', initialOffset - ((j + 1) * (initialOffset / max)));
 
-  }, 1000);
-}
+        }, 1000);
+    }
 }
 
 // Animating the boat
@@ -824,22 +828,58 @@ document.addEventListener("keydown", keyDownTextField, false);
 
 function keyDownTextField(e) {
 
-  var xSpeed = 10;
-  var zSpeed = 10;
-  var rota = 2 * Math.PI / 180;
-  var bpos = boat.position;
-  var brot = boat.rotation;
-  var cpos = camera.position;
-  var crot = camera.rotation;
-  var r1pos = rod1.position;
-  var r2pos = rod2.position;
-  var r3pos = rod3.position;
-  var r1rot = rod1.rotation;
-  var r2rot = rod2.rotation;
-  var r3rot = rod3.rotation;
-  var bBoxpos = baitBox.position;
-  var cos = Math.cos;
-  var sin = Math.sin;
+    var xSpeed = 10;
+    var zSpeed = 10;
+    var rota = 2 * Math.PI / 180;
+    var bpos = boat.position;
+    var brot = boat.rotation;
+    var cpos = camera.position;
+    var crot = camera.rotation;
+    var r1pos = rod1.position;
+    var r2pos = rod2.position;
+    var r3pos = rod3.position;
+    var r1rot = rod1.rotation;
+    var r2rot = rod2.rotation;
+    var r3rot = rod3.rotation;
+    var bBoxpos = baitBox.position;
+    var cos = Math.cos;
+    var sin = Math.sin;
+
+
+
+    function f1() {
+        setTimeout(function () {
+            //about 26 step
+            if (r2pos.y < -1) {
+                r1rot.x = 0;
+                rod2.scale.set(5, 14 + scale, 5);
+                r2pos.y += 0.5;
+                r3pos.y += 0.57;
+                r2pos.z = bpos.z;
+                r3pos.z = r2pos.z;
+                scale -= 0.3461;
+                f1()
+            }
+        }, 100);
+    }
+
+    function f2() {
+        setTimeout(function () {
+            //about 26 step
+            if (r2pos.y > -14) {
+                rod2.scale.set(5, 5-scale, 5);
+                r2pos.y -= 0.5;
+                r3pos.y -=0.57;
+                r2pos.z = bpos.z + sin(brot.y + 3);
+                r3pos.z = r2pos.z;
+                bBoxpos.x = r3pos.x;
+                bBoxpos.y = r3pos.y;
+                bBoxpos.z = r3pos.z;
+                scale -= 0.3461;
+                f2()
+            }
+        }, 100);
+    }
 
     if (e.keyCode in map) {
         map[e.keyCode] = true;
@@ -871,10 +911,10 @@ function keyDownTextField(e) {
             940) {
             brot.y += 120 * Math.PI / 180;
         }
-        cpos.x = bpos.x;
-        cpos.y = bpos.y + 5;
-        cpos.z = bpos.z - 5;
-        crot.y = brot.y - (90 * Math.PI / 180);
+        //cpos.x = bpos.x;
+        //cpos.y = bpos.y + 5;
+        //cpos.z = bpos.z - 5;
+        //crot.y = brot.y - (90 * Math.PI / 180);
         r1pos.x = bpos.x;
         r1pos.z = bpos.z;
         r2pos.x = bpos.x;
@@ -884,30 +924,40 @@ function keyDownTextField(e) {
         r1rot.y = brot.y;
         r2rot.y = brot.y;
         r3rot.y = brot.y;
-        r2pos.z = bpos.z + sin(brot.y+3);
+        r2pos.z = bpos.z + sin(brot.y + 3);
         r3pos.z = r2pos.z;
         baitBox.position.x = 950;
         baitBox.position.y = 950;
         baitBox.position.z = 950;
 
         if (map[70]) { // pull the rod
-            r1rot.x = 0;
+            if (insideWater) {
+                var scale = -0.3461;
+                f1();
+            }
+            insideWater = false;
+            /* r1rot.x = 0;
             rod2.scale.set(5, 5, 5);
             r2pos.y = -0.9;
             r3pos.y = -0.9;
             r2pos.z = bpos.z;
-            r3pos.z = r2pos.z;
+            r3pos.z = r2pos.z; */
 
         }
         if (map[71]) { // throw the rod
-            rod2.scale.set(5, 14, 5);
+            /* rod2.scale.set(5, 14, 5);
             r2pos.y = boat.position.y - 8;
-            r3pos.y = r2pos.y -2;
-            r2pos.z = bpos.z + sin(brot.y+3);
+            r3pos.y = r2pos.y - 2;
+            r2pos.z = bpos.z + sin(brot.y + 3);
             r3pos.z = r2pos.z;
             bBoxpos.x = r3pos.x;
             bBoxpos.y = r3pos.y;
-            bBoxpos.z = r3pos.z;
+            bBoxpos.z = r3pos.z; */
+            if (!insideWater) {
+                var scale = -0.3461;
+                f2();
+            }
+            insideWater = true;
 
         }
     }
@@ -918,11 +968,11 @@ document.onkeyup = myKeyUpHandler;
 function myKeyUpHandler(e) {
     var brot = boat.rotation;
     var bpos = boat.position
-    var crot = camera.rotation;
-    var cpos = camera.position;
+    //var crot = camera.rotation;
+    //var cpos = camera.position;
     if (e.keyCode in map) {
         map[e.keyCode] = false;
-        crot.y = brot.y;
-        cpos.x = bpos.x-14;
+        //crot.y = brot.y;
+        //cpos.x = bpos.x-14;
     }
 };
