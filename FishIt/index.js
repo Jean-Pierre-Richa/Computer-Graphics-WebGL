@@ -930,29 +930,20 @@ function keyDownTextField(e) {
         baitBox.position.y = 950;
         baitBox.position.z = 950;
 
+        //              up ---> down
+        // r1pos.y      -1      -1
+        // r2pos.y      -1      -14
+        // r3pos.y      -1      -16
+
+
         if (map[70]) { // pull the rod
             if (insideWater) {
                 var scale = -0.3461;
                 f1();
             }
             insideWater = false;
-            /* r1rot.x = 0;
-            rod2.scale.set(5, 5, 5);
-            r2pos.y = -0.9;
-            r3pos.y = -0.9;
-            r2pos.z = bpos.z;
-            r3pos.z = r2pos.z; */
-
-        }
+         }
         if (map[71]) { // throw the rod
-            /* rod2.scale.set(5, 14, 5);
-            r2pos.y = boat.position.y - 8;
-            r3pos.y = r2pos.y - 2;
-            r2pos.z = bpos.z + sin(brot.y + 3);
-            r3pos.z = r2pos.z;
-            bBoxpos.x = r3pos.x;
-            bBoxpos.y = r3pos.y;
-            bBoxpos.z = r3pos.z; */
             if (!insideWater) {
                 var scale = -0.3461;
                 f2();
