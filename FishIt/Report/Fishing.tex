@@ -30,6 +30,8 @@
 \usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
 \usepackage{graphicx}
 
+\usepackage{minted} % Used for Code Highlight
+
 \usepackage{sectsty} % Allows customizing section commands
 \allsectionsfont{\centering \normalfont\scshape} % Make all sections centered, the default font and small caps
 
@@ -74,7 +76,7 @@
 %----------------------------------------------------------------------------------------
 \section{Introduction}
 
-The project is about creating a game we named FishIt see figure \ref{world}, which is an interactive game made as close to reality as possible, it simulates a fisherman driving a boat inside a world consisting of everything that we can find in a real world fishing environment, such as the sky, sun, light-house, boat, rod, water, and fishes. The aim from the game is trying to catch as much fishes as possible. Each fish catches increases the total score by 1. \par We used rigid 3D objects, which we later animated using javascript such as the boat, and the rod, which can both be controlled by the user using the keyboard and the fishes, which move randomly in the water. Furthermore, we included a hierarchical structure, which we are going to see in details when we discuss the implementation. The hierarchical structure was applied on several objects such as the boat and the rod. The fishes move randomly and when the rod is thrown in the water, we wait for the bait to collide with a fish and give the user a counter specifying the time within which he should pull the rod to gain points, otherwise the fish will escape and he will not gain a new point.
+The project is about creating a game we named FishIt see figure \ref{world}, which is an interactive game made as close to reality as possible, it simulates a fisherman driving a boat inside a world consisting of everything that we can find in a real world fishing environment, such as the sky, sun, light-house, boat, rod, water, and fishes. The aim from the game is trying to catch as much fishes as possible. Each fish caught increases the total score by 1. \par We used rigid 3D objects, which we later animated using javascript such as the boat, and the rod, which can both be controlled by the user using the keyboard, and the fishes, which move randomly in the water. Furthermore, we included a hierarchical structure, which we are going to see in details when we discuss the implementation. The hierarchical structure was applied on several objects such as the boat and the rod. The fishes move randomly and when the rod is thrown in the water, we wait for the bait to collide with a fish and give the user a counter specifying the time within which he should pull the rod to gain points, otherwise the fish will escape and he will not gain a new point.
 
 \begin{figure}
 \centering
@@ -90,23 +92,23 @@ The project is about creating a game we named FishIt see figure \ref{world}, whi
 %\subsection{Heading on level 2 (subsection)}
 \section{Implementation}
 
-In order to have a clear view about the implementation, this section will be split into several part, where each part will hold details about the implementation of each object. The areas that will be discussed in the following subsections are: the creation of each object, the placement in the environment, whether the object is controllable and how it is controllable, and other details specific to each object.
+In order to have a clear view about the implementation, this section will be split into several part, where each part will hold details about the implementation of each object. The areas that will be discussed in the following subsections are: the creation of each object, the placement in the environment, whether or not the object is controllable and how it is controllable, and other details specific to each object.
 
 \subsection{Sky}
 
-The first object to consider in this project is the sky, because we need the environment to look as real as possible. The sky meshes which hold the geometry of the object that consist of the vertices attributes were imported from three.js. After that, the turbidity, luminance, and other characteristics were specified for the sky to fit this specific environment. The sky is clear and fixed, and cannot be controlled. The turbidity and the other characteristics were chosen to make the daytime look like if it's near the sunset. \textbf{See the Code section}
-\newline
-\newline
-\textbf{Code}
-\begin{lstlisting}
-sky = new THREE.Sky();
-sky.scale.setScalar(450000);
-scene.add(sky);
-\end{lstlisting}
+The first object to consider in this project is the sky, because we need the environment to look as real as possible. The sky is nothing but a \textit{Cube}, enlightened in a certain way and scaled by a value big enough to make it look continuous from the inside (See Figure \ref{external}). After that, the turbidity, luminance, and other characteristics were specified for the sky to fit this specific environment. The sky is clear and fixed, and cannot be controlled by the user. Finally, the above-mentioned characteristics were chosen to make the daytime look like if it's near the sunset. 
+\begin{figure}
+\centering
+\includegraphics[width=15cm, height=7cm]{images/skyBox&sunSphere.png}
+\caption{External view of the Sky Box and the Sun Sphere.}
+\label{external}
+\end{figure}
 
-\subsection{Sun}
+\newpage
 
-An important part of this project is the sun, because we need a light source. In order to have it, as in importing the sky, the sun meshes hold the geometry of the object , which were also imported from three.js, and then the object was added to the scene. After that, the position and visibility were specified for the sun. For better visualization check figure \ref{sun}.
+\subsection{Sun and Light}
+
+An important part of this project is the simulation of the sun as a light source. In order to have it, as for the sky, we added to the environment a huge \textit{Sphere}, positioning it really far away from the center of the scene to make it as realistic as possible.  After that, two light source were added. The first one is a \textit{Directional Light}, which better simulates the sunlight when positioned in the same place of the sun sphere and directed at the scene, while the second one is an \textit{Ambient Light} in order to simulate the diffuse light all over the scene, created by the refraction of the sun light through the atmosphere. For better visualization check figure \ref{sun}. Moreover, another important issue to deal with when it comes to using lights in a scene is shadowing, so \textit{castShadow} function for the light was set to true in order to get the objects in the environment rendered into the shadow map.  \textbf{See also the Code section}.
 
 \begin{figure}[!ht]
 \centering
@@ -115,32 +117,38 @@ An important part of this project is the sun, because we need a light source. In
 \label{sun}
 \end{figure}
 
+\begin{minted}{js}
+light2 = new THREE.AmbientLight(); 
+scene.add(light2);
 
-\subsection{Light}
+light = new THREE.DirectionalLight();
+light.position.set(x, y, z);
+light.castShadow = true;
+scene.add(light);
+\end{minted}
 
-Light is the main external element one have to deal with; For that, it was imported from three.js and its position was chosen according to the sun position, and orientation. An important issue to deal with when it comes to using lights in a scene is shadowing, so castShadow function for the light was set to true in order to get the objects in the environment rendered into the shadow map. The light ambiance was chosen to fit the time of the day, which is the sunset.
-
+\newpage
 
 \subsection{Hierarchy}
 
-A necessary feature is building a hierarchical structure. The structure is obtained through creating nodes in a hierarchical way where each node has a sibling and/or a child. The child is usually the node following the current one, and the sibling is the node parallel or next to the current one. The whole structure have to be aligned along a specific axis based on its desired position, because as we will see, sometimes an object should be below, next, or above the other one. First of all, and in order to have a clean implementation, we need to start by the central object, which is the lighthouse since the other moving objects will be turning around it. After creating all the nodes specifying whether it's a sibling or a child of another node, and specifying the location of the node using the parent's location, we will obtain all the parts connected to each other. for more clarification \textbf{See the Code section}.
+A necessary feature is building a hierarchical structure. The structure is obtained through creating nodes in a hierarchical way where each node has a sibling and/or a child. The child is usually the node following the current one, and the sibling is the node parallel or next to the current one. The whole structure have to be aligned along a specific axis based on its desired position, because as we will see, sometimes an object should be below, next, or above the other one. First of all, and in order to have a clean implementation, we need to start by the central object, which is the lighthouse since the other moving objects will be turning around it. After creating all the nodes specifying whether it's a sibling or a child of another node, and specifying the location of the node using the parent's location, we will obtain all the parts connected to each other. For more clarification \textbf{See the Code section}.
 \newpage
 \textbf{Code}
 
-\begin{lstlisting}
+\begin{minted}{js}
 function initNodes(Id) {
     switch (Id) {
   case boatId:
             t1 = t.add(new THREE.Vector3(270, -6, 600));
             figure [boatId] = createNode(t1, boata, null, rod1Id);
             break;
-\end{lstlisting}
+\end{minted}
 
-As shown above, this is the case of creating the node for the boat, which is rendered using the function boata(), and has the handle of the rod(rod1) and a child.
+As shown above, this is the case of creating the node for the boat, which is rendered using the function \textit{boata()}, and has the handle of the rod(rod1) as a child.
 \subsection{3D Objects}
 
-The approach for adding the different materials used in this project, is importing non-animated 3D objects such as the rod, boat, lighthouse, and fishes. \textbf{See \ref{house}, and the Code section}.
-Using the hierarchical structure we can put different parts together, which in this case are the previously listed objects added to the environment scene. The main idea of using the hierarchy is to simplify the relation between the boat and the different parts of the rod (handle, rope, and bait), which were split to make it easier for the collision checking with the fishes. The boat was imported and then coded from scratch to be moved in the environment by the user. The rod can be thrown and pulled by the user also, but the trick here is to tell the user within which time frame the rod should be pulled after colliding with the fish and this was done using a counter that shows on the screen the slot within which the fish is still in collision with the bait. If the rod was pulled in this time frame, a point will be added to the final score. Otherwise, no points will be gained.\par
+The approach for adding the different materials used in this project, is importing non-animated 3D objects such as the rod, boat, lighthouse, and fishes.\textbf{See e Code section}.
+Using the hierarchical structure we can put different parts together, which in this case are the previously listed objects added to the environment scene. The main idea of using the hierarchy is to simplify the relation between the boat and the different parts of the rod (handle, rope, and bait), which were split to make it easier for the collision checking with the fishes. The boat was imported and then coded from scratch to be moved in the environment by the user. The rod can be thrown and pulled by the user also, but the trick here is to tell the user within which time frame the rod should be pulled after colliding with the fish and this was done using a counter that shows on the screen the slot within which the fish is still in collision with the bait. If the rod was pulled in this time frame, by pressing \textit{"SpaceBar"}, a point will be added to the final score. Otherwise, no points will be gained.\par
 The boat can be driven using the keyboard keys:
 \begin{itemize}
 \item W for moving forward,
@@ -153,7 +161,7 @@ The boat can be driven using the keyboard keys:
 \end{itemize}
 \newpage
 \textbf{Code}
-\begin{lstlisting}
+\begin{minted}{js}
 function boata() {
     loader.load(
         '/models/boat2/scene.gltf',
@@ -161,7 +169,7 @@ function boata() {
             boat = gltf.scene;
             scene.add(boat);
         }
-\end{lstlisting}
+\end{minted}
 
 \begin{figure}[!ht]
 \centering
@@ -172,7 +180,7 @@ function boata() {
 
 \subsection{Camera}
 
-It is important for the user to see what is going on during the time he is playing, more specifically it is crucial to see everything relevant to getting a higher score, and knowing his/her position in the environment. In order to provide this feature, the camera was placed on the boat, where the view changes based on what the user is doing. For example if the user is driving the boat, the camera will show what's in front of it see \ref{boat view}, but when the driving stops, the camera will show the rod, so the user knows whether it is in the water or not see \ref{Drod} and \ref{Urod}.
+It is important for the user to see what is going on during the time he is playing, more specifically it is crucial to see everything relevant to getting a higher score, and knowing his/her position in the environment. In order to provide this feature, the camera was placed on the boat, where the view changes based on what the user is doing. For example if the user is driving the boat, the camera will show what's in front of it (see \ref{boat view}), but when the driving stops, the camera will show the rod, so the user knows whether it is in the water or not (see \ref{Urod}).
 
 \begin{figure}[!ht]
 \centering
@@ -190,7 +198,7 @@ It is important for the user to see what is going on during the time he is playi
 \newpage
 \subsection{Fishes}
 
-A 3D model of a goldfish was imported and used, it was added to the scene a Hundred times, each with a different name. The fishes move randomly in the environment at a constant speed. They move randomly, in order to make it more difficult for the user to predict the next direction of the fish, which makes the game harder and the collision more difficult to happen. The fishes were put at a depth of 20 pixels below the water surface see \ref{fishes}, which is their fixed depth. 
+A 3D model of a goldfish was imported and used, it was added to the scene a Hundred times, each with a different name. The fishes move randomly in the environment at a constant speed. They move randomly, in order to make it more difficult for the user to predict the next direction of the fish, which makes the game harder and the collision more difficult to happen. The fishes were put at a depth of 20 pixels below the water surface (see \ref{fishes}), which is their fixed depth. 
 
 \begin{figure}[!ht]
 \centering
@@ -199,41 +207,47 @@ A 3D model of a goldfish was imported and used, it was added to the scene a Hund
 \label{fishes}
 \end{figure}
 \newpage
-\subsection{Collison}
+\subsection{Collision}
 
-In order for a collision between the bait and a fish to happen, then the bait and the fish should be at the same height on the Y axis, which is 20 pixels below the water surface as previously stated. Because the vertical axis here is Y, since we are using three.js and this is the reference frame orientation in this library. they also should be on the same X, and Z axes points. Boxes were created and fixed around the fishes and the bait, shown in \textbf{Boxes code section} so a collision happens when the 2 boxes are in each others' positions. For better understanding of the implementation, check the \textbf{collision Code section} \newline
+In order for a collision between the bait and a fish to happen, the bait and the fish should be covered by \textit{Boxes} made by \textit{Wire Material} and at the same height on the Y axis, which is 20 pixels below the water surface as previously stated. Because the vertical axis here is Y, since we are using three.js and this is the reference frame orientation in this library. They also should be on the same X, and Z axes points. Boxes were created and coded so as to follow the fishes and the bait movements, so a collision happens when wires of 2 boxes are intersecting. 
+\newline
 
 \textbf{Boxes code}
-\begin{lstlisting}
-var params = { opacity: 0 };
-            var cubeGeometry = new THREE.BoxGeometry(box.getSize(center).x, box.getSize(center).y, box.getSize(
-                center).z);
-            var wireMaterial = new THREE.MeshBasicMaterial({
-                opacity: params.opacity,
-                color: 0xFFFFFF,
-                wireframe: true
-            });
-            baitBox = new THREE.Mesh(cubeGeometry, wireMaterial);
-            scene.add(baitBox);
-\end{lstlisting}
-A cube was created using THREE.js, its opacity was put to 0 so the box is not visible, then the box was added to the scene.
-\newline
+\begin{minted}{js}
+var box = new THREE.Box3().setFromObject(bait);
+var cubeGeometry = new THREE.BoxGeometry(box.getSize(center).x, 
+    box.getSize(center).y, box.getSize(center).z);
+var wireMaterial = new THREE.MeshBasicMaterial({
+    opacity: 0,
+    color: 0xFFFFFF,
+    wireframe: true
+});
+baitBox = new THREE.Mesh(cubeGeometry, wireMaterial);
+scene.add(baitBox);
+\end{minted}
 \par
-\textbf{Collision code}
-\begin{lstlisting}
 
-\end{lstlisting}
-\section{Launching the game}
+\newpage
+\section{Conclusions}
+Finally, a \textit{Homepage} containing the information about the game and its developers has been added at the beginning of the game. So as an FPS counter, in the top right of the page, due to the heavy load of the game. Also background and events audio sounds, were coded and inserted into the game, such as a relaxed whistling or the cast and pull up sounds.
 
+\subsection{Launching The Game}
 For the application to run, we need first to establish a local server, which can be done using python through navigating to the game's directory using the command prompt (terminal shell) and writing: "python -m http.server". After the connection is established, one can open a browser and type "localhost:8000", this will allow the game to load in the browser page.
 
-\section{Third Party}
+\section{Future Improvements}
+\begin{itemize}
+\item  Levelling System
+\item Adding Physics to the Fishing Rod
+\item Randomize Fish Size and Adjust the Score Based on That
+\item With a certain Probability, Fishes are Moving to the Bait
+\end{itemize}
 
-THREE.js: all the object were imported using THREE.js. Sun, sky and water were imported from THREE.js
+\section{Libraries, Frameworks and References}
+\textbf{Three.js} is a cross-browser JavaScript library, based on WebGL, and Application Programming Interface (API) used to create and display animated 3D computer graphics in a web browser.  The entire scene and all the libraries such as water, sky, camera controls and loader is made in Three.js
 \\~\\
-Sketchfab: it was used to download the 3D objects, such as the boat, rod, fishes, and lighthouse.
+\textbf{Sketchfab} was used to download the raw 3D objects, such as the boat, rod, fishes, and lighthouse.
 \\~\\
-Blender: was used to correct the the reference frames of the objects and the orientation and then exported to be imported inside the game using THREE.js
+\textbf{Blender} was used to correct the the reference frames of the objects, the orientation and other minor adjustments
 
 
 \end{document}
