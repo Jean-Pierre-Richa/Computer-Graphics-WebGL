@@ -8,4 +8,10 @@
 #### - Go to the project's directory in the terminal/command-prompt shell
 #### - Initialize a python server
 #### - Open a localhost:8000 from any browser
+
+## Navigating and using the game features
+#### - Use W, S, A, D to drive the boat
+#### - Use F to throw the rod
+#### - Use G to pull the rod
+
 ### Enjoy it!
