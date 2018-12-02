@@ -54,7 +54,7 @@ function BrowserDetection() {
         console.log("Chrome");
         initSounds("ogg");
     }
-    //Check if browser is Firefox 
+    //Check if browser is Firefox
     else if (navigator.userAgent.search("Firefox") >= 0) {
         // insert conditional Firefox Code here
         console.log("Firefox");
@@ -152,7 +152,6 @@ function endQTEvent() {
     console.log("Event Ended!");
 
     flag = true;
-    //endQTEvent = false;
 }
 
 function SetBarsAsUndefined() {
@@ -191,9 +190,7 @@ function onWindowResize() {
 
 init();
 initBasicGraphics();
-//initCustomModels();
-//initSounds();
-//initSounds Replaced called in browser detection
+
 BrowserDetection();
 
 function init() {
@@ -213,22 +210,6 @@ function init() {
     var controls = new THREE.OrbitControls(camera);
     controls.update();
 
-    /* camera.lookAt(0, 0, 0);
-    window.addEventListener('mousemove', function (e) {
-        var mouse3D = new THREE.Vector3(
-            ((event.clientX / window.innerWidth) * 2 - 1) * 300,
-            (-(event.clientY / window.innerHeight) * 2 + 1) * 300,
-            0.5);
-        camera.lookAt(mouse3D);
-    }); */
-
-    /* IF YOU NEED A 360 DEGREES CAMERA, YOU CAN USE POINTERLOCKCONTROL
-    EXAMPLE IS DINO:
-    https://codepen.io/MSEdgeDev/pen/NpKejy */
-
-    /* var looking = new THREE.PointerLockControls( camera );
-    scene.add( looking.getObject() ); */
-    //looking.enabled = true; // Turns on camera rotating with mouse
 
 
     ///////////////////
@@ -364,7 +345,7 @@ function initBasicGraphics() {
     uniforms.sunPosition.value.copy(sunSphere.position);
 }
 
-//function initCustomModels() {
+
 ///////////////////
 //3D MODELS
 ///////////////////
@@ -415,31 +396,12 @@ function boata() {
     );
 }
 
-/* loader.load(
-    '/models/rod/scene.gltf',
-    function (gltf) {
-        gltf.scene.position.set(170, 10, 570);
-        gltf.scene.scale.set(5, 5, 5);
-        gltf.scene.castShadow = true;
-        scene.add(gltf.scene);
-    },
-    function (xhr) {
-        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-    },
-    function (error) {
-        console.log('An error happened');
-    }
-); */
-
 function roda() {
     loader.load(
         '/models/rod/rod13.gltf',
         function (gltf) {
             rod1 = THREE.Object3D.prototype.clone.call(gltf.scene);
-            // rod1.rotation.x = -2;
-            // rod1.position.set(170, 5, 565);
             rod1.position.set(t2.x, t2.y + 5, t2.z);
-            // rod1.position.set(t2.x, t2.y, t2.z);
             rod1.scale.set(5, 5, 5);
             rod1.castShadow = true;
             scene.add(rod1);
@@ -459,10 +421,7 @@ function rodb() {
         '/models/rod/rod14.gltf',
         function (gltf) {
             rod2 = THREE.Object3D.prototype.clone.call(gltf.scene);
-            // rod2.rotation.x = -1.6;
-            // rod2.position.set(170, 4.5, 565);
             rod2.position.set(t3.x, t3.y + 5, t3.z);
-            // rod2.position.set(t3.x, t3.y, t3.z);
             rod2.scale.set(5, 5, 5);
             rod2.castShadow = true;
             scene.add(rod2);
@@ -481,10 +440,7 @@ function rodc() {
         '/models/rod/rod15.gltf',
         function (gltf) {
             rod3 = THREE.Object3D.prototype.clone.call(gltf.scene);
-            // rod2.rotation.x = -1.6;
-            // rod2.position.set(170, 4.5, 565);
             rod3.position.set(t4.x, t4.y + 5, t4.z);
-            // rod2.position.set(t3.x, t3.y, t3.z);
             rod3.scale.set(5, 5, 5);
             rod3.castShadow = true;
 
@@ -499,7 +455,7 @@ function rodc() {
                 center).z);
             var wireMaterial = new THREE.MeshBasicMaterial({
                 opacity: params.opacity,
-                // transparent: true,
+                transparent: true,
                 color: 0xFFFFFF,
                 wireframe: true
             });
@@ -590,7 +546,7 @@ function movimentoPesce(oggetto) {
         function r1(oggetto, i, cubo) {
 
             //TO SLOW DOWN FISH MOVEMENT, UNCOMMENT SETTIMEOUT
-            //setTimeout(function () {
+            // setTimeout(function () {
             if (randRadians > oggetto.rotation.y) {
                 var deltax = oggetto.position.x;
                 var deltaz = oggetto.position.z;
@@ -602,11 +558,11 @@ function movimentoPesce(oggetto) {
                 cubo.position.z += deltaz;
                 r1(oggetto, i, cubo);
             }
-            //}, 300);
+          // }, 50);
         }
 
         function r2(oggetto, i, cubo) {
-            //setTimeout(function () {
+            // setTimeout(function () {
             if (randRadians < oggetto.rotation.y) {
                 var deltax = oggetto.position.x;
                 var deltaz = oggetto.position.z;
@@ -618,7 +574,7 @@ function movimentoPesce(oggetto) {
                 cubo.position.z += deltaz;
                 r2(oggetto, i, cubo);
             }
-            //}, 300);
+          // }, 50);
         }
 
         randRadians = randRadians + oggetto[i].rotation.y
@@ -769,6 +725,7 @@ var animate = function () {
 
     if (keyboard.down("enter")) {
         info.style.visibility = 'hidden';
+        flag = true;
     }
 
     if (castFlag) {
@@ -911,10 +868,10 @@ function keyDownTextField(e) {
             940) {
             brot.y += 120 * Math.PI / 180;
         }
-        //cpos.x = bpos.x;
-        //cpos.y = bpos.y + 5;
-        //cpos.z = bpos.z - 5;
-        //crot.y = brot.y - (90 * Math.PI / 180);
+        cpos.x = bpos.x;
+        cpos.y = bpos.y + 5;
+        cpos.z = bpos.z - 5;
+        crot.y = brot.y - (90 * Math.PI / 180);
         r1pos.x = bpos.x;
         r1pos.z = bpos.z;
         r2pos.x = bpos.x;
@@ -959,11 +916,11 @@ document.onkeyup = myKeyUpHandler;
 function myKeyUpHandler(e) {
     var brot = boat.rotation;
     var bpos = boat.position
-    //var crot = camera.rotation;
-    //var cpos = camera.position;
+    var crot = camera.rotation;
+    var cpos = camera.position;
     if (e.keyCode in map) {
         map[e.keyCode] = false;
-        //crot.y = brot.y;
-        //cpos.x = bpos.x-14;
+        crot.y = brot.y;
+        cpos.x = bpos.x-14;
     }
 };
