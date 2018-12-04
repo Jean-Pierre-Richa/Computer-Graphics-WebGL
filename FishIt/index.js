@@ -869,8 +869,8 @@ function keyDownTextField(e) {
             brot.y += 120 * Math.PI / 180;
         }
         cpos.x = bpos.x;
-        cpos.y = bpos.y + 5;
-        cpos.z = bpos.z - 5;
+        cpos.y = bpos.y+7;
+        cpos.z = bpos.z;
         crot.y = brot.y - (90 * Math.PI / 180);
         r1pos.x = bpos.x;
         r1pos.z = bpos.z;
@@ -921,6 +921,6 @@ function myKeyUpHandler(e) {
     if (e.keyCode in map) {
         map[e.keyCode] = false;
         crot.y = brot.y;
-        cpos.x = bpos.x-14;
+        cpos.x = bpos.x;
     }
 };
