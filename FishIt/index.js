@@ -650,8 +650,8 @@ function init() {
 
 
     //ORBIT CONTROL
-    var controls = new THREE.OrbitControls(camera);
-    controls.update();
+    /* var controls = new THREE.OrbitControls(camera);
+    controls.update(); */
 
 
 
@@ -989,7 +989,7 @@ function initModels() {
 
             // BOAT COLLISION
             var params = {
-                opacity: 100
+                opacity: 0
             };
             var objectCenter = new THREE.Vector3();
             var objectBox = new THREE.Box3().setFromObject(boat);
@@ -998,7 +998,7 @@ function initModels() {
                 objectCenter).z);
             var objectMaterial = new THREE.MeshBasicMaterial({
                 opacity: params.opacity,
-                // transparent: true,
+                transparent: true,
                 color: 0xFFFFFF,
                 wireframe: true
             });
@@ -1043,7 +1043,7 @@ function initModels() {
 
             //COLLISION BOXES
             var params = {
-                opacity: 100
+                opacity: 0
             };
             var objectCenter = new THREE.Vector3();
             var objectBox = new THREE.Box3().setFromObject(greenM);
@@ -1051,7 +1051,7 @@ function initModels() {
                 objectCenter).z);
             var objectMaterial = new THREE.MeshBasicMaterial({
                 opacity: params.opacity,
-                // transparent: true,
+                transparent: true,
                 color: 0xFFFFFF,
                 wireframe: true
             });
@@ -1061,7 +1061,7 @@ function initModels() {
             fixedObjects[0].position.z = greenM.position.z;
             //COLLISION BOXES
             var params = {
-                opacity: 100
+                opacity: 0
             };
             var objectCenter = new THREE.Vector3();
             var objectBox = new THREE.Box3().setFromObject(instance1);
@@ -1069,7 +1069,7 @@ function initModels() {
                 objectCenter).z);
             var objectMaterial = new THREE.MeshBasicMaterial({
                 opacity: params.opacity,
-                // transparent: true,
+                transparent: true,
                 color: 0xFFFFFF,
                 wireframe: true
             });
@@ -1079,7 +1079,7 @@ function initModels() {
             fixedObjects[1].position.z = instance1.position.z;
             //COLLISION BOXES
             var params = {
-                opacity: 100
+                opacity: 0
             };
             var objectCenter = new THREE.Vector3();
             var objectBox = new THREE.Box3().setFromObject(instance2);
@@ -1087,7 +1087,7 @@ function initModels() {
                 objectCenter).z);
             var objectMaterial = new THREE.MeshBasicMaterial({
                 opacity: params.opacity,
-                // transparent: true,
+                transparent: true,
                 color: 0xFFFFFF,
                 wireframe: true
             });
@@ -1097,7 +1097,7 @@ function initModels() {
             fixedObjects[2].position.z = instance2.position.z;
             //COLLISION BOXES
             var params = {
-                opacity: 100
+                opacity: 0
             };
             var objectCenter = new THREE.Vector3();
             var objectBox = new THREE.Box3().setFromObject(instance3);
@@ -1105,7 +1105,7 @@ function initModels() {
                 objectCenter).z);
             var objectMaterial = new THREE.MeshBasicMaterial({
                 opacity: params.opacity,
-                // transparent: true,
+                transparent: true,
                 color: 0xFFFFFF,
                 wireframe: true
             });
@@ -1151,7 +1151,7 @@ function initModels() {
 
             //COLLISION BOXES
             var params = {
-                opacity: 100
+                opacity: 0
             };
             var objectCenter = new THREE.Vector3();
             var objectBox = new THREE.Box3().setFromObject(lighthouse);
@@ -1159,7 +1159,7 @@ function initModels() {
                 objectCenter).z);
             var objectMaterial = new THREE.MeshBasicMaterial({
                 opacity: params.opacity,
-                // transparent: true,
+                transparent: true,
                 color: 0xFFFFFF,
                 wireframe: true
             });
@@ -1229,7 +1229,7 @@ function initModels() {
 
             //COLLISION BOXES
             var params = {
-                opacity: 100
+                opacity: 0
             };
             var center = new THREE.Vector3();
             var box = new THREE.Box3().setFromObject(rod3);
@@ -1280,7 +1280,7 @@ function initModels() {
 
                 //COLLISION BOXES
                 var params = {
-                    opacity: 100
+                    opacity: 0
                 };
                 var center = new THREE.Vector3();
                 var box = new THREE.Box3().setFromObject(pesce[i]);
