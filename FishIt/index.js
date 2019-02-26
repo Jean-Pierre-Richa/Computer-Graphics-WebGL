@@ -1119,7 +1119,7 @@ function initModels() {
             scene.add(fixedObjects[1]);
             scene.add(fixedObjects[2]);
             scene.add(fixedObjects[3]);
-            /* 
+            /*
 
                         objectsCollidableList.push(fixedObjects[0]);
                         objectsCollidableList.push(fixedObjects[1]);
@@ -1248,7 +1248,7 @@ function initModels() {
             baitBox.position.y = rod3.position.y;
             baitBox.position.z = rod3.position.z; */
             collidableMeshList.push(baitBox);
-            /* 
+            /*
                         var target = new THREE.Vector3();
                         baitBox.position.z = rod3.getWorldPosition(target).x;
                         baitBox.position.y = rod3.getWorldPosition(target).y;
@@ -1530,9 +1530,9 @@ var animate = function () {
         baitBox.position.x = rod3.getWorldPosition(target).z;
     } */
     if (boatFlag) {
-        if (boat.position.x < 200 || boat.position.z < 200
-            || boat.position.x > 1000 || boat.position.z > 1000) {
-            boat.translateOnAxis(xAxis, -5);
+        if (boat.position.x < 150 || boat.position.z < 150
+            || boat.position.x > 1200 || boat.position.z > 1200) {
+            boat.translateOnAxis(xAxis, -20);
         }
     }
 
