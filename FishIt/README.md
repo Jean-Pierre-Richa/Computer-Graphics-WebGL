@@ -1,4 +1,4 @@
-# FishIt
+# FishIT
 ## About the game
 
 #### A fishing game, created mainly using HTML, JS, and Three.js.
@@ -13,5 +13,9 @@
 #### - Use W, S, A, D to drive the boat
 #### - Use F to throw the rod
 #### - Use G to pull the rod
+#### - Press SpaceBar when a fish eat the bait to gain a point
 
 ### Enjoy it!
+=======
+
+[Demo Here](https://sad-boyd-68f820.netlify.com/)
