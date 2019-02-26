@@ -10,11 +10,13 @@ var boxes = [];
 var movingCubes = [];
 var collidableMeshList = [];
 var objectsCollidableList = [];
+var colliders = [];
 var fixedObjects = [];
 var container, stats, info;
 var scene, renderer, camera;
 var light, light2;
 var progress;
+var fishing = false;
 var quickTime = false;
 var pressSpace = false;
 //var endQTEvent = false;
@@ -23,8 +25,12 @@ var bar = document.getElementById("bar-1");
 var xAxis = new THREE.Vector3(1, 0, 0);
 var yAxis = new THREE.Vector3(0, 1, 0);
 var zAxis = new THREE.Vector3(0, 0, 1);
+var boatBox;
 var baitBox;
+var lightHouseBox;
 var baited;
+
+var tempVar = false;
 
 var mouse = {
     x: 0,
@@ -37,6 +43,8 @@ var stopRod = false;
 var stopMod = true;
 var modality = true;
 var rodInHand = false;
+
+var colliderSystem = new THREEx.ColliderSystem();
 
 //TRAPEZOIDAL SPEED
 var finalCameraPos = new THREE.Vector3(-15, 5, 0);
@@ -985,6 +993,7 @@ function initModels() {
             };
             var objectCenter = new THREE.Vector3();
             var objectBox = new THREE.Box3().setFromObject(boat);
+
             var objectGeometry = new THREE.BoxGeometry(objectBox.getSize(objectCenter).x, objectBox.getSize(objectCenter).y, objectBox.getSize(
                 objectCenter).z);
             var objectMaterial = new THREE.MeshBasicMaterial({
@@ -995,11 +1004,12 @@ function initModels() {
             });
             boatBox = new THREE.Mesh(objectGeometry, objectMaterial);
             objectsCollidableList.push(boatBox);
-            boatBox.position.x = -0.54;
-            boatBox.position.y = -0.4;
-            boatBox.position.z = -0.15;
+            boatBox.scale.set(0.25, 0.25, 0.25);
+            boat.add(boatBox);
 
-            scene.add(boatBox);
+            var collider = new THREEx.ColliderBox3(boatBox, objectBox);
+            colliders.push(collider);
+
             scene.add(boat);
             boatFlag = true;
 
@@ -1026,10 +1036,10 @@ function initModels() {
             instance1.position.set(0, 900, 2300);
             instance2.position.set(2300, 900, 0);
             instance3.position.set(-2300, 900, 0);
-            greenM.rotation.y = 10*Math.PI/180;
-            instance1.rotation.y = -190*Math.PI/180;
-            instance2.rotation.y = -90*Math.PI/180;
-            instance3.rotation.y = 90*Math.PI/180;
+            greenM.rotation.y = 10 * Math.PI / 180;
+            instance1.rotation.y = -190 * Math.PI / 180;
+            instance2.rotation.y = -90 * Math.PI / 180;
+            instance3.rotation.y = 90 * Math.PI / 180;
 
             //COLLISION BOXES
             var params = {
@@ -1039,7 +1049,7 @@ function initModels() {
             var objectBox = new THREE.Box3().setFromObject(greenM);
             var objectGeometry = new THREE.BoxGeometry(objectBox.getSize(objectCenter).x, objectBox.getSize(objectCenter).y, objectBox.getSize(
                 objectCenter).z);
-            var objectMaterial= new THREE.MeshBasicMaterial({
+            var objectMaterial = new THREE.MeshBasicMaterial({
                 opacity: params.opacity,
                 // transparent: true,
                 color: 0xFFFFFF,
@@ -1057,7 +1067,7 @@ function initModels() {
             var objectBox = new THREE.Box3().setFromObject(instance1);
             var objectGeometry = new THREE.BoxGeometry(objectBox.getSize(objectCenter).x, objectBox.getSize(objectCenter).y, objectBox.getSize(
                 objectCenter).z);
-            var objectMaterial= new THREE.MeshBasicMaterial({
+            var objectMaterial = new THREE.MeshBasicMaterial({
                 opacity: params.opacity,
                 // transparent: true,
                 color: 0xFFFFFF,
@@ -1075,7 +1085,7 @@ function initModels() {
             var objectBox = new THREE.Box3().setFromObject(instance2);
             var objectGeometry = new THREE.BoxGeometry(objectBox.getSize(objectCenter).x, objectBox.getSize(objectCenter).y, objectBox.getSize(
                 objectCenter).z);
-            var objectMaterial= new THREE.MeshBasicMaterial({
+            var objectMaterial = new THREE.MeshBasicMaterial({
                 opacity: params.opacity,
                 // transparent: true,
                 color: 0xFFFFFF,
@@ -1093,7 +1103,7 @@ function initModels() {
             var objectBox = new THREE.Box3().setFromObject(instance3);
             var objectGeometry = new THREE.BoxGeometry(objectBox.getSize(objectCenter).x, objectBox.getSize(objectCenter).y, objectBox.getSize(
                 objectCenter).z);
-            var objectMaterial= new THREE.MeshBasicMaterial({
+            var objectMaterial = new THREE.MeshBasicMaterial({
                 opacity: params.opacity,
                 // transparent: true,
                 color: 0xFFFFFF,
@@ -1109,6 +1119,12 @@ function initModels() {
             scene.add(fixedObjects[1]);
             scene.add(fixedObjects[2]);
             scene.add(fixedObjects[3]);
+            /* 
+
+                        objectsCollidableList.push(fixedObjects[0]);
+                        objectsCollidableList.push(fixedObjects[1]);
+                        objectsCollidableList.push(fixedObjects[2]);
+                        objectsCollidableList.push(fixedObjects[3]); */
 
             scene.add(greenM);
             scene.add(instance1);
@@ -1141,18 +1157,17 @@ function initModels() {
             var objectBox = new THREE.Box3().setFromObject(lighthouse);
             var objectGeometry = new THREE.BoxGeometry(objectBox.getSize(objectCenter).x, objectBox.getSize(objectCenter).y, objectBox.getSize(
                 objectCenter).z);
-            var objectMaterial= new THREE.MeshBasicMaterial({
+            var objectMaterial = new THREE.MeshBasicMaterial({
                 opacity: params.opacity,
                 // transparent: true,
                 color: 0xFFFFFF,
                 wireframe: true
             });
             fixedObjects[4] = new THREE.Mesh(objectGeometry, objectMaterial);
-            fixedObjects[4].position.x = lighthouse.position.x;
-            fixedObjects[4].position.y = lighthouse.position.y;
-            fixedObjects[4].position.z = lighthouse.position.z;
 
-            scene.add(fixedObjects[4]);
+            lighthouse.add(fixedObjects[4]);
+
+            objectsCollidableList.push(fixedObjects[4]);
             scene.add(lighthouse);
         },
         function (xhr) {
@@ -1227,14 +1242,19 @@ function initModels() {
                 wireframe: true
             });
             baitBox = new THREE.Mesh(cubeGeometry, wireMaterial);
+            baitBox.position.set(-0.15, -0.35, -1.55);
             /* baitBox.scale.set(5, 5, 5);
             baitBox.position.x = rod3.position.x;
             baitBox.position.y = rod3.position.y;
             baitBox.position.z = rod3.position.z; */
             collidableMeshList.push(baitBox);
-            baitBox.position.z = -1.54;
-            baitBox.position.y = -0.4;
-            baitBox.position.x = -0.15;
+            /* 
+                        var target = new THREE.Vector3();
+                        baitBox.position.z = rod3.getWorldPosition(target).x;
+                        baitBox.position.y = rod3.getWorldPosition(target).y;
+                        baitBox.position.x = rod3.getWorldPosition(target).z;
+                        scene.add(baitBox);
+                        tempVar = true; */
 
         },
         function (xhr) {
@@ -1260,7 +1280,7 @@ function initModels() {
 
                 //COLLISION BOXES
                 var params = {
-                    opacity: 0
+                    opacity: 100
                 };
                 var center = new THREE.Vector3();
                 var box = new THREE.Box3().setFromObject(pesce[i]);
@@ -1290,11 +1310,11 @@ function initModels() {
             console.log('An error happened');
         }
     );
-    setTimeout(function() {
+    setTimeout(function () {
         body.add(rod1);
         rod1.add(rod2);
-        rod3.add(baitBox);
         rod2.add(rod3);
+        rod3.add(baitBox);
     }, 10000);
 
 }
@@ -1421,6 +1441,25 @@ function collision(obj) {
     }
 }
 
+function collisionBoat(obj) {
+    for (var i = 0; i < obj.length; i++) {
+        var originPoint = fixedObjects[i].position.clone();
+        for (var vertexIndex = 0; vertexIndex < fixedObjects[i].geometry.vertices.length; vertexIndex++) {
+            var localVertex = fixedObjects[i].geometry.vertices[vertexIndex].clone();
+            var globalVertex = localVertex.applyMatrix4(fixedObjects[i].matrix);
+            var directionVector = globalVertex.sub(fixedObjects[i].position);
+
+            var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
+            var collisionResults = ray.intersectObjects(objectsCollidableList);
+            if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
+                console.log(" Hit with n: " + i.toString());
+            }
+
+        }
+    }
+}
+
+
 function initSounds(extension) {
     var audioListener = new THREE.AudioListener();
     camera.add(audioListener);
@@ -1483,11 +1522,24 @@ function initSounds(extension) {
 ///////////////////
 
 var animate = function () {
+
+    /* if (tempVar) {
+        var target = new THREE.Vector3();
+        baitBox.position.z = rod3.getWorldPosition(target).x;
+        baitBox.position.y = rod3.getWorldPosition(target).y;
+        baitBox.position.x = rod3.getWorldPosition(target).z;
+    } */
+
+    if (boat.position.x < 200 || boat.position.z < 200){
+        boat.translateOnAxis(xAxis, -5);
+    }
+
     requestAnimationFrame(animate);
     TWEEN.update()
     stats.update();
 
     //keyboard.update();
+    //collisionBoat(fixedObjects);
 
     if (quickTime) {
         flag = false;
@@ -1507,6 +1559,7 @@ var animate = function () {
 
     if (flag) {
         //baitBox.position.y = -17.5;
+        //collisionBoat(fixedObjects);
         movimentoPesce(pesce);
         collision(pesce);
     }
@@ -1519,56 +1572,58 @@ var animate = function () {
         zzz-((35)*Math.cos(Math.degrees(boat.rotation.y)))) */
 
     if (keyboard.pressed("ctrl")) {
-        if (!stopMod) {
-            if (!modality) {
-                stopMod = true;
-                document.getElementById("mode").innerHTML = navMode;
+        if (!fishing) {
+            if (!stopMod) {
+                if (!modality) {
+                    stopMod = true;
+                    document.getElementById("mode").innerHTML = navMode;
 
 
-                hiddenCamera.position.set(finalCameraPos.x, finalCameraPos.y, finalCameraPos.z);
-                hiddenCamera.lookAt(0, 3, 0);
-                endRotation = new THREE.Euler().copy(hiddenCamera.rotation);
-                navigationTween.start();
-                rotationTween = new TWEEN.Tween(camera.rotation)
-                    .to({
-                        x: endRotation.x,
-                        y: endRotation.y,
-                        z: endRotation.z
-                    }, 3000)
-                    .easing(TWEEN.Easing.Quadratic.InOut)
-                    .start();
-                humanNavigationTween();
+                    hiddenCamera.position.set(finalCameraPos.x, finalCameraPos.y, finalCameraPos.z);
+                    hiddenCamera.lookAt(0, 3, 0);
+                    endRotation = new THREE.Euler().copy(hiddenCamera.rotation);
+                    navigationTween.start();
+                    rotationTween = new TWEEN.Tween(camera.rotation)
+                        .to({
+                            x: endRotation.x,
+                            y: endRotation.y,
+                            z: endRotation.z
+                        }, 3000)
+                        .easing(TWEEN.Easing.Quadratic.InOut)
+                        .start();
+                    humanNavigationTween();
 
-                setTimeout(function () {
-                    document.getElementById("mode").innerHTML = "";
-                    stopMod = false;
-                }, 2950);
-                modality = !modality;
-            } else if (modality) {
-                stopMod = true;
-                document.getElementById("mode").innerHTML = fishMode;
+                    setTimeout(function () {
+                        document.getElementById("mode").innerHTML = "";
+                        stopMod = false;
+                    }, 2950);
+                    modality = !modality;
+                } else if (modality) {
+                    stopMod = true;
+                    document.getElementById("mode").innerHTML = fishMode;
 
-                /* hiddenCamera.position.set(6, 9, 4.5);
-                hiddenCamera.lookAt(0, 3, 0); */
-                endRotation = new THREE.Euler(-0.78, 0.34, 0.32, 'XYZ')
+                    /* hiddenCamera.position.set(6, 9, 4.5);
+                    hiddenCamera.lookAt(0, 3, 0); */
+                    endRotation = new THREE.Euler(-0.78, 0.34, 0.32, 'XYZ')
 
-                fishingTween.start();
+                    fishingTween.start();
 
-                rotationTween = new TWEEN.Tween(camera.rotation)
-                    .to({
-                        x: endRotation.x,
-                        y: endRotation.y,
-                        z: endRotation.z
-                    }, 3000)
-                    .easing(TWEEN.Easing.Quadratic.InOut)
-                    .start();
-                humanFishingTween();
+                    rotationTween = new TWEEN.Tween(camera.rotation)
+                        .to({
+                            x: endRotation.x,
+                            y: endRotation.y,
+                            z: endRotation.z
+                        }, 3000)
+                        .easing(TWEEN.Easing.Quadratic.InOut)
+                        .start();
+                    humanFishingTween();
 
-                setTimeout(function () {
-                    document.getElementById("mode").innerHTML = "";
-                    stopMod = false;
-                }, 2950);
-                modality = !modality;
+                    setTimeout(function () {
+                        document.getElementById("mode").innerHTML = "";
+                        stopMod = false;
+                    }, 2950);
+                    modality = !modality;
+                }
             }
         }
     }
@@ -1578,6 +1633,7 @@ var animate = function () {
         if (!modality) {
             if (!stopArm) {
                 if (rodInHand) {
+                    fishing = false;
                     baitUp();
                     setTimeout(function () {
                         stopArm = true;
@@ -1598,6 +1654,7 @@ var animate = function () {
                         stopArm = false;
                     }, 2000);
                 } else {
+                    fishing = true;
                     stopArm = true;
                     armUp();
                     setTimeout(function () {
@@ -1647,7 +1704,7 @@ var animate = function () {
     // NAVIGATION MODE
     if (keyboard.pressed("w")) {
         if (modality) {
-            boat.translateOnAxis(xAxis, 0.5);
+            boat.translateOnAxis(xAxis, 3);
         }
     }
 
