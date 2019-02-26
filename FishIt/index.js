@@ -1016,7 +1016,7 @@ function initModels() {
         },
         function (xhr) {
             //console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-            if (xhr.loaded / xhr.total == 1) {}
+            if (xhr.loaded / xhr.total == 1) { }
         },
         function (error) {
             console.log('An error happened');
@@ -1172,7 +1172,7 @@ function initModels() {
         },
         function (xhr) {
             //console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-            if (xhr.loaded / xhr.total == 1) {}
+            if (xhr.loaded / xhr.total == 1) { }
         },
         function (error) {
             console.log('An error happened');
@@ -1529,9 +1529,11 @@ var animate = function () {
         baitBox.position.y = rod3.getWorldPosition(target).y;
         baitBox.position.x = rod3.getWorldPosition(target).z;
     } */
-
-    if (boat.position.x < 200 || boat.position.z < 200){
-        boat.translateOnAxis(xAxis, -5);
+    if (boatFlag) {
+        if (boat.position.x < 200 || boat.position.z < 200
+            || boat.position.x > 1000 || boat.position.z > 1000) {
+            boat.translateOnAxis(xAxis, -5);
+        }
     }
 
     requestAnimationFrame(animate);
@@ -1724,6 +1726,7 @@ var animate = function () {
     if (pressSpace) {
         if (keyboard.pressed("space")) {
             //endQTEvent();
+            armUp();
             pullup.play();
             collisi = true;
             updateScore(collisi);
